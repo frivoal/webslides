@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang=en>
+<meta charset="utf-8">
+<link type="text/css" rel="stylesheet" href="webslides.css"/>
+<script src="webslides.js" defer></script>
+<style>
+[data-in="foo"] div { color: blue; }
+[data-from~="foo"] div {  border: solid 1px; }
+.in-foo div { color: blue; }
+.from-foo div { border: solid 1px; }
+</style>
+
+<section>
+	<h1>My presentation</h1>
+</section>
+<section data-states="foo bar baz">
+	<h2>More</h2>
+	<div data-hidden-in=print>
+		<p>foo ooo oo oo o ooooooo <br>oooo
+		<p data-hidden-in="bar">Going out, then back
+		<p data-hidden-from="bar">Going out, stay out
+
+	</div>
+</section>
+<section data-states="yoyo">
+	<h2>Even More</h2>
+	<div hidden data-visible-in="print yoyo" data-visible-as="inline-block">
+		<p>foo ooo oo oo o ooooooo <br>oooo
+	</div>
+</section>

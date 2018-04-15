@@ -1,0 +1,99 @@
+/* Slide structure */
+body { margin: 0; }
+section {
+	min-width: 100vw;
+	min-height: 100vh;
+	display: flex;
+	flex-flow: column;
+	align-items:center;
+}
+
+/* Slide styling */
+section :first-child:last-child {
+	justify-self: center;
+	margin: auto;
+}
+
+/* State management */
+/* default display types based on Firefox's UA stylesheet*/
+address,
+article,
+aside,
+blockquote,
+body,
+center,
+dd,
+details,
+dir,
+div,
+dl,
+dt,
+figcaption,
+figure,
+footer,
+form,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+header,
+hgroup,
+hr,
+html,
+listing,
+main,
+menu,
+multicol,
+nav,
+ol,
+p,
+plaintext,
+pre,
+section,
+summary,
+ul,
+xmp {
+	--display-as: block;
+}
+table { --display-as: table; }
+caption { --display-as: table-caption; }
+tr { --display-as: table-row; }
+col { --display-as: table-column; }
+colgroup { --display-as: table-column-group; }
+tbody { --display-as: table-row-group; }
+thead { --display-as: table-header-group; }
+tfoot { --display-as: table-footer-group; }
+td, th { --display-as: table-cell; }
+li { --display-as: list-item; }
+ruby { --display-as: ruby; }
+rb { --display-as: ruby-base; }
+rt { --display-as: ruby-text; }
+rtc { --display-as: ruby-text-container; }
+
+@media print {
+	[data-visible-in~=print] { display: var(--display-as, inline); }
+	[data-hidden-in~=print] { display: none; }
+}
+
+/* Snapping */
+body {
+	/* old style */ 
+	-ms-scroll-snap-type: mandatory;
+	scroll-snap-type: mandatory;
+	-ms-scroll-snap-destination: 50% 50%;
+	scroll-snap-destination: 50% 50%;
+
+	/* new style */
+	scroll-snap-type: block mandatory;
+}
+section {
+	/* new style */
+	scroll-snap-align: center;
+
+	/* old style */
+	-ms-scroll-snap-coordinate: 50% 50%;
+	scroll-snap-coordinate: 50% 50%;
+}
+
