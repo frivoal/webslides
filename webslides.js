@@ -82,6 +82,7 @@ var webslides = {
 			var states = (webslides.currentSlide.getAttribute("data-states") ||"").split(" ");
 			clearInState(webslides.currentSlide, states);
 			webslides.currentSlide = webslides.currentSlide.nextElementSibling;
+			history.pushState(1, document.title, "#"+webslides.currentSlide.id);
 			webslides.currentSlide.scrollIntoView();
 		}
 	}
@@ -120,6 +121,8 @@ var webslides = {
 				setInState(webslides.currentSlide, webslides.state);
 				setFromState(webslides.currentSlide, states);
 			}
+			history.pushState(1, document.title, "#"+webslides.currentSlide.id);
+
 		}
 		webslides.currentSlide.scrollIntoView();
 	}
@@ -136,13 +139,33 @@ var webslides = {
 	function resnap() {
 		webslides.currentSlide.scrollIntoView();
 	}
+	function addSlideNumbers() {
+		var slides = document.querySelectorAll("body > section");
+		for (var i = 0; i < slides.length; i++) {
+			if (!slides[i].id) {
+				slides[i].id="s"+i;
+				console.warn("Side number "+i+" does not have an id. Autogenerating one. Manually add an id to be able to link to this slide when javascript is off.");
+			}
+		}
+	}
 
-	webslides.currentSlide = document.querySelector("body > section:first-of-type");
+	function initCurrentSlide() {
+		var anchor = document.URL.replace(/^[^#]*#?/, "");
+		if (anchor) {
+			webslides.currentSlide = document.querySelector("body > section#"+anchor);
+		} else {
+			webslides.currentSlide = document.querySelector("body > section:first-of-type");
+		}
+	}
+
 	document.body.addEventListener("keydown", handleKey);
 	document.body.style="overflow: hidden";
 	window.addEventListener("resize", resnap);
 
 	generateStateStyle();
+
+	addSlideNumbers();
+	initCurrentSlide();
 	resnap();
 })();
 
