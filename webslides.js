@@ -3,11 +3,14 @@
 var webslides = {
 	// take anchor into account
 	currentSlide : null,
-	state : null
+	state : null,
+	options : {
+		onScreenNav : true,
+	}
 };
 
-
 window.addEventListener("DOMContentLoaded", function() {
+	/* State Management */
 	function clearInState( element, states) {
 		states.forEach(function(state) {
 			element.classList.remove("in-" + state);
@@ -30,6 +33,7 @@ window.addEventListener("DOMContentLoaded", function() {
 		});
 	}
 
+	/* Document preparation */
 	function generateStateStyle() {
 		var states = new Set();
 		var es = document.querySelectorAll("[data-states]");
@@ -59,6 +63,18 @@ window.addEventListener("DOMContentLoaded", function() {
 		document.head.append(style_elm)
 	}
 
+	function addSlideNumbers() {
+		var slides = document.querySelectorAll("body > section");
+		for (var i = 0; i < slides.length; i++) {
+			if (!slides[i].id) {
+				slides[i].id="slide_"+i;
+				console.warn("Side number "+i+" does not have an id. Autogenerating one. Manually add an id to be able to link to this slide when javascript is off.");
+			}
+		}
+	}
+
+
+	/* Navigation */
 	function next() {
 		var states_string = webslides.currentSlide.getAttribute("data-states") || "";
 		if (states_string)  {
@@ -78,14 +94,18 @@ window.addEventListener("DOMContentLoaded", function() {
 	}
 
 	function nextSlide() {
-		if (webslides.currentSlide.nextElementSibling) {
+		if (webslides.currentSlide.nextElementSibling && webslides.currentSlide.nextElementSibling.localName == "section" )  {
 			webslides.state = null;
 			var states = (webslides.currentSlide.getAttribute("data-states") ||"").split(" ");
 			clearInState(webslides.currentSlide, states);
+
 			webslides.currentSlide = webslides.currentSlide.nextElementSibling;
+			states = (webslides.currentSlide.getAttribute("data-states") ||"").split(" ");
+			clearInState(webslides.currentSlide, states);
+			clearFromState(webslides.currentSlide, states);
 			var hash = webslides.currentSlide.id;
 			history.pushState(null, document.title+" @ "+hash, "#"+hash);
-			webslides.currentSlide.scrollIntoView();
+			resnap();
 		}
 	}
 
@@ -127,60 +147,89 @@ window.addEventListener("DOMContentLoaded", function() {
 			history.pushState(null, document.title+" @ "+hash, "#"+hash);
 
 		}
-		webslides.currentSlide.scrollIntoView();
+		resnap();
 	}
 
-	function handleKey(e) {
-		if (e.key=="Backspace" || e.key == "ArrowUp" || (e.key==" " && e.shiftKey)) {
-			e.preventDefault();
-			prev();
-		} else if (e.key==" " || e.key == "ArrowDown") {
-			e.preventDefault();
-			next();
-		}
-	}
+	/* Consistency of URL and position */
 	function resnap() {
 		webslides.currentSlide.scrollIntoView();
-	}
-	function addSlideNumbers() {
-		var slides = document.querySelectorAll("body > section");
-		for (var i = 0; i < slides.length; i++) {
-			if (!slides[i].id) {
-				slides[i].id="slide_"+i;
-				console.warn("Side number "+i+" does not have an id. Autogenerating one. Manually add an id to be able to link to this slide when javascript is off.");
-			}
-		}
 	}
 
 	function initCurrentSlide() {
 		var anchor = document.URL.replace(/^[^#]*#?/, "");
 		if (anchor) {
 			webslides.currentSlide = document.querySelector("body > section#"+anchor);
+			webslides.state = null;
 		} else {
 			webslides.currentSlide = document.querySelector("body > section:first-of-type");
+			webslides.state = null;
 		}
 	}
 
-	addSlideNumbers();
+	function updateURLfromScroll() {
+		var slides = document.querySelectorAll("body > section");
+		for (var i = 0; i < slides.length; i++) {
+			var slide = slides[i];
+			var y = slide.getBoundingClientRect().y;
+			if (y < 1 && y > -1) {
+				var hash = slide.id;
+				webslides.currentSlide = slide;
+				history.pushState(null, document.title+" @ "+hash, "#"+hash);
+				break;
+			}
+		}
+	}
+
+	/* UI Helper */
+	function fullscreen() {
+		var e = document.documentElement;
+		var rfs = e.requestFullscreen ||
+			e.webkitRequestFullScreen ||
+			e.mozRequestFullScreen ||
+			e.msRequestFullscreen;
+
+		if (rfs) {
+			rfs.apply(e);
+		}
+
+	}
+
+	function handleKey(e) {
+		if (e.key=="Backspace" || e.key == "ArrowUp" || e.key == "ArrowLeft" || (e.key==" " && e.shiftKey)) {
+			e.preventDefault();
+			prev();
+		} else if (e.key==" " || e.key == "ArrowDown" || e.key == "ArrowRight") {
+			e.preventDefault();
+			next();
+		} else if (e.key=="f") {
+			fullscreen();
+		}
+	}
+
+	/* Events */
 
 	document.body.addEventListener("keydown", handleKey);
-
 	window.addEventListener("resize", resnap);
+	document.body.addEventListener("scroll", updateURLFromScroll);
 
+	/* Init */
+	addSlideNumbers();
 	generateStateStyle();
-
 	initCurrentSlide();
-
 	resnap();
 
+	/* API setup */
 	webslides.next = next;
 	webslides.prev = prev;
 	webslides.nextSlide = nextSlide;
 	webslides.prevSlide = prevSlide;
+	webslides.fullscreen = fullscreen
 
-	var nav_elm = document.createElement("div");
-	nav_elm.style = "position:fixed; bottom:0; right:0; margin:1em;"
-	nav_elm.innerHTML = "<button onclick='webslides.prev()'>◀️</button><button onclick='webslides.next()'>▶️</button>";
-	document.body.append(nav_elm);
+	/* UI Setup */
+	if (webslides.options.onScreenNav) {
+		var nav_elm = document.createElement("div");
+		nav_elm.id= "nav_btns";
+		nav_elm.innerHTML = "<button onclick='webslides.prev()'>◀️</button><button onclick='webslides.next()'>▶️</button><button onclick='webslides.fullscreen()'>🎦</button>";
+		document.body.append(nav_elm);
+	}
 });
-
