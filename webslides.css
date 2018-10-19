@@ -32,11 +32,18 @@ section {
 }
 
 /* State management */
-[data-hidden] { visibility: hidden; }
-@media print {
-	[data-visible-in~=print] { visibility: visible; }
-	[data-hidden-in~=print] { visibility: hidden; }
+body.has-script [data-visible-from],
+[data-visible-in] {
+	visibility: hidden;
 }
+@media print {
+	[data-visible-in~=print] {
+		visibility: visible !important;
+	}
+	[data-visible-from] { visibility: visible !important; }
+	[data-hidden-in~=print] { visibility: hidden !important; }
+}
+body:not(.has-script) [data-visible-in~=print] { visibility: visible !important; }
 
 /* Navigation buttons */
 

@@ -14,15 +14,17 @@
 <section id=cover>
 	<h1>My presentation</h1>
 </section>
-<section data-states="l1 l2 l3 l4 l5" style=background:green>
+<section data-states="p1 l1 l2 l3 l4 l5 p2" style=background:green>
 	<h2>Lists</h2>
+	<p data-visible-from=p1>Foo
 	<ul>
-		<li data-hidden data-visible-from=l1>First
-		<li data-hidden data-visible-from=l2>Second
-		<li data-hidden data-visible-from=l3>Third
-		<li data-hidden data-visible-from=l4>There's more!
-		<li data-hidden data-visible-from=l5>That's all folks.
+		<li data-visible-from=l1>First
+		<li data-visible-from=l2>Second
+		<li data-visible-from=l3>Third
+		<li data-visible-from=l4>There's more!
+		<li data-visible-from=l5>That's all folks.
 	</ul>
+	<p data-visible-from=p2>Bar
 </section>
 <section data-states="foo bar baz" style=background:pink>
 	<h2>More</h2>
@@ -33,12 +35,15 @@
 
 	</div>
 </section>
-<section data-states="yiyi yoyo">
+<section data-states="yiyi yoyo yaya">
 	<h2>Even More</h2>
-	<div data-hidden data-visible-from="yiyi">
-		<p>fii iii ii ii i iiiiiii <br>iiii
+	<div data-visible-from="yiyi">
+		fii iii ii ii i iiiiiii <br>iiii
 	</div>
-	<div data-hidden data-visible-in="print yoyo">
-		<p>foo ooo oo oo o ooooooo <br>oooo
+	<div data-visible-in="print yoyo">
+		foo ooo oo oo o ooooooo <br>oooo
+	</div>
+	<div data-visible-in="yaya">
+		faa aaa aa aa a aaaaaaa <br>aaaa
 	</div>
 </section>

@@ -44,15 +44,16 @@ window.addEventListener("DOMContentLoaded", function() {
 		});
 		var styles = "";
 		states.forEach(function(s) {
-			styles += ".in-"+s+" [data-hidden-in~=\""+s+"\"] { visibility: hidden; }\n";
-			styles += ".from-"+s+" [data-hidden-from~=\""+s+"\"] { visibility: hidden; }\n";
-			styles += ".in-"+s+" [data-visible-in~=\""+s+"\"] { visibility: visible; }\n";
-			styles += ".from-"+s+" [data-visible-from~=\""+s+"\"] { visibility: visible; }\n";
+			styles += "body.has-script .in-"+s+" [data-hidden-in~=\""+s+"\"] { visibility: hidden; }\n";
+			styles += "body.has-script .from-"+s+" [data-hidden-from~=\""+s+"\"] { visibility: hidden; }\n";
+			styles += "body.has-script .in-"+s+" [data-visible-in~=\""+s+"\"] { visibility: visible; }\n";
+			styles += "body.has-script .from-"+s+" [data-visible-from~=\""+s+"\"] { visibility: visible; }\n";
 
 		});
 		var style_elm = document.createElement("style");
 		style_elm.innerHTML = styles;
-		document.head.append(style_elm)
+		document.head.append(style_elm);
+		document.body.classList.add("has-script");
 	}
 
 	function addSlideNumbers() {
