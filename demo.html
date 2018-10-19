@@ -25,6 +25,16 @@ section :first-child:last-child {
 <section id=cover>
 	<h1>My presentation</h1>
 </section>
+<section data-states="l1 l2 l3 l4 l5" style=background:green>
+	<h2>Lists</h2>
+	<ul>
+		<li data-hidden data-visible-from=l1>First
+		<li data-hidden data-visible-from=l2>Second
+		<li data-hidden data-visible-from=l3>Third
+		<li data-hidden data-visible-from=l4>There's more!
+		<li data-hidden data-visible-from=l5>That's all folks.
+	</ul>
+</section>
 <section data-states="foo bar baz" style=background:pink>
 	<h2>More</h2>
 	<div data-hidden-in=print>
@@ -36,10 +46,10 @@ section :first-child:last-child {
 </section>
 <section data-states="yiyi yoyo">
 	<h2>Even More</h2>
-	<div hidden data-visible-from="yiyi" data-visible-as="inline-block">
+	<div data-hidden data-visible-from="yiyi">
 		<p>fii iii ii ii i iiiiiii <br>iiii
 	</div>
-	<div hidden data-visible-in="print yoyo" data-visible-as="inline-block">
+	<div data-hidden data-visible-in="print yoyo">
 		<p>foo ooo oo oo o ooooooo <br>oooo
 	</div>
 </section>

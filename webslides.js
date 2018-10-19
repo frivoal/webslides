@@ -42,21 +42,13 @@ window.addEventListener("DOMContentLoaded", function() {
 				states.add(state);
 			});
 		});
-		var displays = new Set();
-		var es = document.querySelectorAll("[data-visible-as]");
-		es.forEach(function(e) {
-			displays.add(e.getAttribute("data-visible-as"));
-		});
 		var styles = "";
 		states.forEach(function(s) {
-			styles += ".in-"+s+" [data-hidden-in~=\""+s+"\"] { display: none; }\n";
-			styles += ".from-"+s+" [data-hidden-from~=\""+s+"\"] { display: none; }\n";
-			styles += ".in-"+s+" [data-visible-in~=\""+s+"\"] { display: var(--display-as, inline); }\n";
-			styles += ".from-"+s+" [data-visible-from~=\""+s+"\"] { display: var(--display-as, inline); }\n";
+			styles += ".in-"+s+" [data-hidden-in~=\""+s+"\"] { visibility: hidden; }\n";
+			styles += ".from-"+s+" [data-hidden-from~=\""+s+"\"] { visibility: hidden; }\n";
+			styles += ".in-"+s+" [data-visible-in~=\""+s+"\"] { visibility: visible; }\n";
+			styles += ".from-"+s+" [data-visible-from~=\""+s+"\"] { visibility: visible; }\n";
 
-		});
-		displays.forEach(function(d) {
-			styles += "[data-visible-as=\""+d+"\"] { --display-as: "+d+"; }\n";
 		});
 		var style_elm = document.createElement("style");
 		style_elm.innerHTML = styles;
