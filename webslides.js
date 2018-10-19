@@ -82,7 +82,8 @@ var webslides = {
 			var states = (webslides.currentSlide.getAttribute("data-states") ||"").split(" ");
 			clearInState(webslides.currentSlide, states);
 			webslides.currentSlide = webslides.currentSlide.nextElementSibling;
-			history.pushState(1, document.title, "#"+webslides.currentSlide.id);
+			var hash = webslides.currentSlide.id;
+			history.pushState(null, document.title+" @ "+hash, "#"+hash);
 			webslides.currentSlide.scrollIntoView();
 		}
 	}
@@ -121,7 +122,8 @@ var webslides = {
 				setInState(webslides.currentSlide, webslides.state);
 				setFromState(webslides.currentSlide, states);
 			}
-			history.pushState(1, document.title, "#"+webslides.currentSlide.id);
+			var hash = webslides.currentSlide.id;
+			history.pushState(null, document.title+" @ "+hash, "#"+hash);
 
 		}
 		webslides.currentSlide.scrollIntoView();
