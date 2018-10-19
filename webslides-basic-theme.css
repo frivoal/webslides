@@ -1,0 +1,16 @@
+body {
+	font-size: 6vmin;
+}
+section {
+	display: flex;
+	flex-flow: column;
+	align-content:center;
+	justify-content:center;
+	flex-wrap: wrap;
+}
+.section :first-child:last-child {
+	justify-self: center;
+}
+h1, h2 {
+	text-align: center;
+}
