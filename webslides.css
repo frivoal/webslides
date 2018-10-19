@@ -90,10 +90,9 @@ body {
 }
 section {
 	/* new style */
-	scroll-snap-align: center;
+	scroll-snap-align: start;
 
 	/* old style */
 	-ms-scroll-snap-coordinate: 50% 50%;
 	scroll-snap-coordinate: 50% 50%;
 }
-
