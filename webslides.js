@@ -166,7 +166,7 @@ window.addEventListener("DOMContentLoaded", function() {
 		}
 	}
 
-	function updateURLfromScroll() {
+	function updateURLFromScroll() {
 		var slides = document.querySelectorAll("body > section");
 		for (var i = 0; i < slides.length; i++) {
 			var slide = slides[i];
