@@ -4,6 +4,17 @@
 <link type="text/css" rel="stylesheet" href="webslides.css"/>
 <script src="webslides.js" defer></script>
 <style>
+/* Minimal theme */
+section {
+	display: flex;
+	flex-flow: column;
+	align-items:center;
+}
+section :first-child:last-child {
+	justify-self: center;
+	margin: auto;
+}
+
 [data-in="foo"] div { color: blue; }
 [data-from~="foo"] div {  border: solid 1px; }
 .in-foo div { color: blue; }
