@@ -6,7 +6,8 @@ var webslides = {
 	state : null
 };
 
-(function() {
+
+window.addEventListener("DOMContentLoaded", function() {
 	function clearInState( element, states) {
 		states.forEach(function(state) {
 			element.classList.remove("in-" + state);
@@ -160,14 +161,26 @@ var webslides = {
 		}
 	}
 
+	addSlideNumbers();
+
 	document.body.addEventListener("keydown", handleKey);
-	document.body.style="overflow: hidden";
+
 	window.addEventListener("resize", resnap);
 
 	generateStateStyle();
 
-	addSlideNumbers();
 	initCurrentSlide();
+
 	resnap();
-})();
+
+	webslides.next = next;
+	webslides.prev = prev;
+	webslides.nextSlide = nextSlide;
+	webslides.prevSlide = prevSlide;
+
+	var nav_elm = document.createElement("div");
+	nav_elm.style = "position:fixed; bottom:0; right:0; margin:1em;"
+	nav_elm.innerHTML = "<button onclick='webslides.prev()'>◀️</button><button onclick='webslides.next()'>▶️</button>";
+	document.body.append(nav_elm);
+});
 
