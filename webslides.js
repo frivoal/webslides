@@ -47,7 +47,7 @@ var webslides = {
 			styles += ".in-"+s+" [data-hidden-in~=\""+s+"\"] { display: none; }\n";
 			styles += ".from-"+s+" [data-hidden-from~=\""+s+"\"] { display: none; }\n";
 			styles += ".in-"+s+" [data-visible-in~=\""+s+"\"] { display: var(--display-as, inline); }\n";
-			styles += ".from-"+s+" [data-hidden-from~=\""+s+"\"] { display: var(--display-as, inline); }\n";
+			styles += ".from-"+s+" [data-visible-from~=\""+s+"\"] { display: var(--display-as, inline); }\n";
 
 		});
 		displays.forEach(function(d) {
