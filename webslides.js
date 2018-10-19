@@ -221,7 +221,7 @@ window.addEventListener("DOMContentLoaded", function() {
 	if (webslides.options.onScreenNav) {
 		var nav_elm = document.createElement("div");
 		nav_elm.id= "nav_btns";
-		nav_elm.innerHTML = "<button onclick='webslides.prev()'>◀️</button><button onclick='webslides.next()'>▶️</button><button onclick='webslides.fullscreen()'>🎦</button>";
+		nav_elm.innerHTML = "<button onclick='webslides.prev()'><svg viewBox='0 0 10 10' width='16'><path fill='currentColor' d='M0,10 5,0 10,10z'/></svg></button><button onclick='webslides.next()'><svg viewBox='0 0 10 10' width='16'><path fill='currentColor' d='M0,0 5,10 10,0z'/></svg></button><button onclick='webslides.fullscreen()'><svg viewBox='0 0 10 10' width='16'><path fill='currentColor' d='M0,0 4,0 4,1 1,1 1,4 0,4z'/><path fill='currentColor' d='M10,0 6,0 6,1 9,1 9,4 10,4z'/><path fill='currentColor' d='M0,10 4,10 4,9 1,9 1,6 0,6z'/><path fill='currentColor' d='M10,10 6,10 6,9 9,9 9,6 10,6z'/><path fill='currentColor' d='M1,0 5,5 0,1z'/><path fill='currentColor' d='M9,0 5,5 10,1z'/><path fill='currentColor' d='M1,10 5,5 0,9z'/><path fill='currentColor' d='M9,10 5,5 10,9z'/></svg></button>";
 		document.body.append(nav_elm);
 	}
 });
