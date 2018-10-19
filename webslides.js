@@ -202,7 +202,7 @@ window.addEventListener("DOMContentLoaded", function() {
 
 	document.body.addEventListener("keydown", handleKey);
 	window.addEventListener("resize", resnap);
-	document.body.addEventListener("scroll", updateURLFromScroll);
+	document.addEventListener("scroll", updateURLFromScroll);
 
 	/* Init */
 	addSlideNumbers();

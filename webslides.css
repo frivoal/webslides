@@ -1,20 +1,14 @@
 /* Slide structure */
-  /* This whole section would be nicer with vh/vw,
-   * but this is more compatible. */
-html, body {
-	width: 100%;
-	height: 100%;
-}
-html { overflow: hidden; }
 body {
 	margin: 0;
-	overflow: scroll;
 }
 section {
 	box-sizing: border-box;
-	width: 100%;
-	min-height: 100%;
+	width: 100vw;
+	min-height: 100vh;
 	overflow: hidden;
+	page-break-after: always;
+	break-after: page;
 }
 
 /* Snapping */
