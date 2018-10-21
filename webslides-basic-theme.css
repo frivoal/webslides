@@ -3,14 +3,20 @@ body {
 }
 section {
 	display: flex;
-	flex-flow: column;
-	align-content:center;
-	justify-content:center;
-	flex-wrap: wrap;
+	flex-flow: column wrap;
+	align-content: center;
+	justify-content: flex-start;
+	padding: 1em;
 }
-.section :first-child:last-child {
+section :first-child:last-child {
 	justify-self: center;
 }
-h1, h2 {
+h1, h2, h3 {
 	text-align: center;
+}
+pre {
+	white-space: pre-wrap;
+}
+h1, h2, h3, h4, h5, h6, p, dl, ul, ol, li, figure {
+	margin-block-start: 0;
 }
