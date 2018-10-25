@@ -53,7 +53,6 @@ window.addEventListener("DOMContentLoaded", function() {
 		var style_elm = document.createElement("style");
 		style_elm.innerHTML = styles;
 		document.head.append(style_elm);
-		document.body.classList.add("has-script");
 	}
 
 	function addSlideNumbers() {
@@ -191,9 +190,11 @@ window.addEventListener("DOMContentLoaded", function() {
 	function handleKey(e) {
 		if (e.key=="Backspace" || e.key == "ArrowUp" || e.key == "ArrowLeft" || (e.key==" " && e.shiftKey)) {
 			e.preventDefault();
+			document.body.classList.add("has-script");
 			prev();
 		} else if (e.key==" " || e.key == "ArrowDown" || e.key == "ArrowRight") {
 			e.preventDefault();
+			document.body.classList.add("has-script");
 			next();
 		} else if (e.key=="f") {
 			fullscreen();
