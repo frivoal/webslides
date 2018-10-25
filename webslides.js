@@ -183,6 +183,7 @@ window.addEventListener("DOMContentLoaded", function() {
 
 		if (rfs) {
 			rfs.apply(e);
+			resnap();
 		}
 
 	}
