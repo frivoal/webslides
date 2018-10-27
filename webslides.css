@@ -32,7 +32,7 @@ section {
 }
 
 /* State management */
-body.has-script [data-visible-from],
+body.uses-script [data-visible-from],
 [data-visible-in] {
 	visibility: hidden;
 }
@@ -43,7 +43,7 @@ body.has-script [data-visible-from],
 	[data-visible-from] { visibility: visible !important; }
 	[data-hidden-in~=print] { visibility: hidden !important; }
 }
-body:not(.has-script) [data-visible-in~=print] { visibility: visible !important; }
+body:not(.uses-script) [data-visible-in~=print] { visibility: visible !important; }
 
 /* Navigation buttons */
 @media print { #nav_btns { display: none; } }

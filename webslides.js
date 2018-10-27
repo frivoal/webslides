@@ -44,10 +44,10 @@ window.addEventListener("DOMContentLoaded", function() {
 		});
 		var styles = "";
 		states.forEach(function(s) {
-			styles += "body.has-script .in-"+s+" [data-hidden-in~=\""+s+"\"] { visibility: hidden; }\n";
-			styles += "body.has-script .from-"+s+" [data-hidden-from~=\""+s+"\"] { visibility: hidden; }\n";
-			styles += "body.has-script .in-"+s+" [data-visible-in~=\""+s+"\"] { visibility: visible; }\n";
-			styles += "body.has-script .from-"+s+" [data-visible-from~=\""+s+"\"] { visibility: visible; }\n";
+			styles += "body.uses-script .in-"+s+" [data-hidden-in~=\""+s+"\"] { visibility: hidden; }\n";
+			styles += "body.uses-script .from-"+s+" [data-hidden-from~=\""+s+"\"] { visibility: hidden; }\n";
+			styles += "body.uses-script .in-"+s+" [data-visible-in~=\""+s+"\"] { visibility: visible; }\n";
+			styles += "body.uses-script .from-"+s+" [data-visible-from~=\""+s+"\"] { visibility: visible; }\n";
 
 		});
 		var style_elm = document.createElement("style");
@@ -68,7 +68,7 @@ window.addEventListener("DOMContentLoaded", function() {
 
 	/* Navigation */
 	function next() {
-		document.body.classList.add("has-script");
+		document.body.classList.add("uses-script");
 		var states_string = webslides.currentSlide.getAttribute("data-states") || "";
 		if (states_string)  {
 			var states = states_string.split(" ");
@@ -103,7 +103,7 @@ window.addEventListener("DOMContentLoaded", function() {
 	}
 
 	function prev() {
-		document.body.classList.add("has-script");
+		document.body.classList.add("uses-script");
 		var states_string = webslides.currentSlide.getAttribute("data-states") || ""; 
 		if (states_string)  {
 			var states = states_string.split(" ");
