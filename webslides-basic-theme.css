@@ -7,6 +7,7 @@ section {
 	align-content: center;
 	justify-content: flex-start;
 	padding: 1em;
+	position: relative;
 }
 section :first-child:last-child {
 	justify-self: center;
@@ -19,4 +20,8 @@ pre {
 }
 h1, h2, h3, h4, h5, h6, p, dl, ul, ol, li, figure {
 	margin-block-start: 0;
+}
+li > ul,
+li:not(:first-child) {
+	margin-top: 0.5em;
 }
