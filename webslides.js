@@ -68,6 +68,7 @@ window.addEventListener("DOMContentLoaded", function() {
 
 	/* Navigation */
 	function next() {
+		document.body.classList.add("has-script");
 		var states_string = webslides.currentSlide.getAttribute("data-states") || "";
 		if (states_string)  {
 			var states = states_string.split(" ");
@@ -102,6 +103,7 @@ window.addEventListener("DOMContentLoaded", function() {
 	}
 
 	function prev() {
+		document.body.classList.add("has-script");
 		var states_string = webslides.currentSlide.getAttribute("data-states") || ""; 
 		if (states_string)  {
 			var states = states_string.split(" ");
@@ -190,11 +192,9 @@ window.addEventListener("DOMContentLoaded", function() {
 	function handleKey(e) {
 		if (e.key=="Backspace" || e.key == "ArrowUp" || e.key == "ArrowLeft" || (e.key==" " && e.shiftKey)) {
 			e.preventDefault();
-			document.body.classList.add("has-script");
 			prev();
 		} else if (e.key==" " || e.key == "ArrowDown" || e.key == "ArrowRight") {
 			e.preventDefault();
-			document.body.classList.add("has-script");
 			next();
 		} else if (e.key=="f") {
 			fullscreen();
