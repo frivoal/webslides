@@ -10,7 +10,8 @@ section {
 	position: relative;
 }
 section :first-child:last-child {
-	justify-self: center;
+	margin-top: auto;
+	margin-bottom: auto;
 }
 h1, h2, h3 {
 	text-align: center;
@@ -18,7 +19,7 @@ h1, h2, h3 {
 pre {
 	white-space: pre-wrap;
 }
-h1, h2, h3, h4, h5, h6, p, dl, ul, ol, li, figure {
+h1, h2, h3, h4, h5, h6, p, dl, ul, ol, li, figure, pre {
 	margin-block-start: 0;
 }
 li > ul,

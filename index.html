@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang=en>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" >
+<link rel="stylesheet" href="webslides.css">
+<link rel="stylesheet" href="webslides-basic-theme.css">
+<script src="webslides.js"></script>
+
+<link rel="stylesheet" href="default.min.css">
+<script src="highlight.pack.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css?family=Raleway:200,400,400i,700,700i');
+
+@font-face {
+	font-family: "Anonymous Pro";
+	src: url('fonts/Anonymous Pro Minus.ttf');
+}
+
+body { font-family: "Raleway", sans-serif; }
+h1, h2, h3 {
+	font-weight: 100;
+	font-variant: small-caps;
+}
+h1 { font-size: 2em; }
+.key {
+	white-space nowrap;
+	font-family: "Anonymous Pro", monospace;
+	font-size: 0.8em;
+	background: #ddd;
+	padding: 0.1ch 0.4ch 0ch;
+	border: solid 1px #aaa;
+	border-radius: 0.3ch;
+}
+pre { font-size: 0.8em; }
+</style>
+
+<section id=cover>
+	<div>
+	<h1>WebSlides</h1>
+	<p>My little web-based slide framework.
+	</div>
+</section>
+
+<section id=user-doc>
+	<h2>User Documentation</h2>
+</section>
+
+<section id=navigation>
+	<h3>Navigation</h3>
+	<ul>
+		<li>
+			Press <span class=key>F</span>
+			or click <svg viewBox='0 0 10 10' style="width: 1ch;" width='16'><path fill='currentColor' d='M0,0 4,0 4,1 1,1 1,4 0,4z'/><path fill='currentColor' d='M10,0 6,0 6,1 9,1 9,4 10,4z'/><path fill='currentColor' d='M0,10 4,10 4,9 1,9 1,6 0,6z'/><path fill='currentColor' d='M10,10 6,10 6,9 9,9 9,6 10,6z'/><path fill='currentColor' d='M1,0 5,5 0,1z'/><path fill='currentColor' d='M9,0 5,5 10,1z'/><path fill='currentColor' d='M1,10 5,5 0,9z'/><path fill='currentColor' d='M9,10 5,5 10,9z'/></svg>
+			to enter or exit full screen. <span class=key>Esc</span> also exits full screen.
+
+		<li>
+			Press <span class=key>Space</span>,
+			<span class=key>→</span>,
+			<span class=key>↓</span>,
+			or click <svg viewBox='0 0 10 10' style="width: 1ch;" width='16'><path fill='currentColor' d='M0,0 5,10 10,0z'/></svg>
+			to advance in the presentation.
+		<li>
+			Press <span class=key>Shift+Space</span>,
+			<span class=key>Backspace</span>,
+			<span class=key>←</span>,
+			<span class=key>↑</span>,
+			or click <svg viewBox='0 0 10 10' style="width: 1ch;" width='16'><path fill='currentColor' d='M0,10 5,0 10,10z'/></svg>
+			to step back in the presentation.
+
+		<li>
+			You can also scroll through the slides using the scrollbar, touch-screen or touch-pad swiping, etc.
+			Works best in a browser with support for <a href="https://caniuse.com/#feat=css-snappoints">scroll snapping</a>.
+</section>
+
+<section id=state-transitions>
+	<h3>State Transitions</h3>
+	<p>Slides are shown in their final states when printing,
+	when JavaScript is not supported/enabled,
+	<em>and</em> until either the on screen controls or the keyboard shortcuts for previous/next
+	have been used at least once.
+
+	<p>Merely scrolling through the slide show does not trigger state transitions.
+
+	<p><i>Tip:</i> Press <span class=key>←</span> at the beginning of the presentation
+	to turn on the stateful behavior without advancing the presentation.
+
+</section>
+
+<section id=autor-doc>
+	<h2>Author Documentation</h2>
+</section>
+
+<section>
+	<h3>Set-up</h3>
+	<ol>
+		<li>Download <span class=file>webslides.js</span> and <span class=file>webslides.css</span>
+		from <a href="https://www.github.com/frivoal/webslides">Github</a>.
+		<li>Start from this template:
+<pre><code class=html>&lt;!doctype html>
+&lt;meta charset=utf-8>
+&lt;meta name=viewport content="width=device-width, initial-scale=1">
+&lt;link href="webslides.css" rel=stylesheet>
+&lt;script src="webslides.js">&lt;/script></code></pre>
+	</ol>
+</section>
+
+<section id=slides>
+	<h3>Slides</h3>
+	<p>Slides are just top-level <code>&lt;section></code> elements.
+	<p>Don't forget to give them an <code>id</code> to be able to link to them.
+	<p>They have a <code>width</code> of <code>100%</code>, and a <code>min-height</code> of <code>100vh</code>.
+	<p>Add content and style it anyway you want.
+</section>
+
+<section id=add-states>
+	<h3>Adding States</h3>
+	<p>Each slide has an implicit unnamed initial state.
+	<p>To add more states, add <code>data-states="foo bar"</code> as an attribute to the relevant <code>&lt;section></code>.
+	<p>The previous/next keyboard shortcuts and on screen controls will step through each state,
+	starting from the initial unnamed one, before flipping to the previous/next slide.
+</section>
+
+<section id=state-visibility>
+	<h3>State Controlled Visibility</h3>
+
+	<p>Elements with <code>data-visible-from="foo"</code> are initially hidden,
+	and revealed when the slide is in state <code>foo</code>, or a later state.
+
+	<p>Elements with <code>data-visible-in="foo bar"</code> are initially hidden,
+	and revealed when the slide is in state <code>foo</code> or <code>bar</code>,
+	but not any other states.
+</section>
+
+<section id=printing>
+	<h3>Printing</h3>
+
+	<p>Elements width <code>data-visible-from</code>
+	(but not those with <code>data-visible-in</code>)
+	are also displayed when printing or when the stateful mode is not activated
+	(see <a href="#state-transitions">State Transitions</a>).
+
+	<p>You can also use the reserved keyword <code>print</code> as a value of <code>data-visible-in</code>,
+	to make elements display when printing or when the stateful mode is not activated.
+</section>
+
+<section id=using-states>
+	<h3>Using States from CSS</h3>
+	<p>When a slide is in state <code>foo</code>,
+	the classes <code>in-foo</code> and <code>from-foo</code> are added to it.
+
+	<p><code>in-foo</code> is removed after transitioning to the following state,
+	but <code>from-foo</code> is kept.
+
+	<p>In stateful mode, the <code>uses-script</code> class is added to the <code>body</code> element.
+	It is absent in print mode, non stateful mode, and when JavaScript fails to load.
+
+	<p>These can be used to style elements is the slide as desired.
+</section>
+
+<section id=samples>
+	<div>
+		<h2>Sample slides</h2>
+		<p>Look at the source to see how they're done.
+	</div>
+</section>
+
+<section data-states="l1 l2 l3 l4" id=ex1>
+	<h3>Example 1</h3>
+	<ul>
+		<li data-visible-from=l1>Progressively
+		<li data-visible-from=l2>reveal
+		<li data-visible-from=l3>list
+		<li data-visible-from=l4>items
+	</ul>
+</section>
+
+<section data-states="l1 l2 l3 l4" id=ex2>
+<style>
+#ex2 li { color: gray; }
+#ex2.in-l1 [data-visible-from=l1],
+#ex2.in-l2 [data-visible-from=l2],
+#ex2.in-l3 [data-visible-from=l3],
+#ex2.in-l4 [data-visible-from=l4] {
+	color: black;
+}
+body:not(.uses-script) #ex2 li { color: black; }
+</style>
+	<h3>Example 2</h3>
+	<ul>
+		<li data-visible-from=l1>Progressively reveal
+		<li data-visible-from=l2>list items.
+		<li data-visible-from=l3>Gray out
+		<li data-visible-from=l4>all but the last.
+	</ul>
+</section>
+
+<section id=ex3>
+<style>
+#ex3 { writing-mode: vertical-rl; }
+#ex3 h3 { text-orientation: upright; }
+#ex3 div { margin: auto; }
+</style>
+<div>
+	<h3>Example 3</h3>
+
+	<p>You can mix writing modes as well,
+	no sweat.
+	This does not disturb the slide system.
+</div>
+</section>
+
+<section id=ex4 data-states="t1 t2 t3">
+<style>
+#ex4 table { border-collapse: collapse; }
+#ex4 td, #ex4 th { border: solid 2px; }
+#ex4.in-t2 tr:nth-child(2) { background: lightpink; }
+</style>
+	<h3>Example 4</h3>
+
+	<table>
+		<tr>
+			<th>Foo
+			<td data-visible-from=t1>Progressive content
+		<tr>
+			<th>Bar
+			<td data-visible-from=t2>and temporary highlights
+		<tr>
+			<th>Baz
+			<td data-visible-from=t3>on parts of a table
+	</table>
+</section>
+
+<section id=ex5 data-states="anim1 anim2 stop">
+<style>
+#ex5 div {
+	border: solid 50px;
+	border-radius: 50px;
+	border-top-color: blue;
+	border-bottom-color: red;
+	border-left-color: yellow;
+	border-right-color: purple;
+	position: absolute;
+}
+#a1 {
+	left: 0;
+	bottom: 0;
+}
+#a2 {
+	right: 0;
+	top: 0;
+}
+#ex5.in-anim1 #a1,
+#ex5.in-anim2 #a1 {
+	animation: spin 2s linear infinite;
+}
+#ex5.in-anim2 #a2 {
+	animation: bounce 1s ease-in-out infinite alternate;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes bounce {
+  from { height: 0; }
+  to { height: 50vh; }
+}
+</style>
+	<h3>Example 5</h3>
+
+	<ul>
+		<li data-visible-from=anim1>Animation 1 starts
+		<li data-visible-from=anim2>Animation 2 starts
+		<li data-visible-from=stop>Both animations stop
+	</ul>
+	<p data-visible-in=print>This slide has animated content.
+	<div id=a1></div>
+	<div id=a2></div>
+</section>
+<script>hljs.initHighlightingOnLoad();</script>
