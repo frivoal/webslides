@@ -181,12 +181,20 @@ window.addEventListener("DOMContentLoaded", function() {
 			e.webkitRequestFullScreen ||
 			e.mozRequestFullScreen ||
 			e.msRequestFullscreen;
-
-		if (rfs) {
+		var efs = document.exitFullscreen ||
+			document.webkitExitFullscreen ||
+			document.msExitFullScreen;
+		var fse = document.fullscreenElement ||
+		          document.webkitFullscreenElement ||
+		          document.mozFullscreenElement ||
+		          document.msFullscreenElement ;
+		if (fse && efs) {
+			efs.apply(document);
+			resnap();
+		} else if (rfs) {
 			rfs.apply(e);
 			resnap();
 		}
-
 	}
 
 	function handleKey(e) {
