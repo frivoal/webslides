@@ -93,13 +93,13 @@ body:not(.uses-script) [data-visible-in~=print] { visibility: visible !important
 }
 #nav_btns svg {
 	width: 24px;
-	padding-right: 5px;
+	margin-right: 5px;
 }
-#nav_btns button:last-of-type svg { padding: 0 0 0 5px;}
+#nav_btns button:last-of-type svg { margin: 0 0 0 5px;}
 #nav_btns:hover { opacity: 1; }
 @media (pointer: coarse) {
 	#nav_btns svg {
 		width: 8vmin;
-		padding-right: 15px;
+		margin-right: 15px;
 	}
 }
