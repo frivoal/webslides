@@ -221,10 +221,10 @@ window.addEventListener("DOMContentLoaded", function() {
 	}
 
 	function handleKey(e) {
-		if (e.key=="Backspace" || e.key == "ArrowUp" || e.key == "ArrowLeft" || (e.key==" " && e.shiftKey)) {
+		if (e.key=="Backspace" || e.key == "ArrowUp" || e.key == "ArrowLeft" || e.key == "PageUp" || (e.key==" " && e.shiftKey)) {
 			e.preventDefault();
 			prev();
-		} else if (e.key==" " || e.key == "ArrowDown" || e.key == "ArrowRight") {
+		} else if (e.key==" " || e.key == "ArrowDown" || e.key == "ArrowRight" || e.key == "PageDown") {
 			e.preventDefault();
 			next();
 		} else if (e.key=="f") {
