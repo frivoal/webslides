@@ -56,7 +56,7 @@ section {
 }
 
 /* State management */
-body.uses-script [data-visible-from],
+:root.uses-script [data-visible-from],
 [data-visible-in] {
 	visibility: hidden;
 }
@@ -67,7 +67,7 @@ body.uses-script [data-visible-from],
 	[data-visible-from] { visibility: visible !important; }
 	[data-hidden-in~=print] { visibility: hidden !important; }
 }
-body:not(.uses-script) [data-visible-in~=print] { visibility: visible !important; }
+:root:not(.uses-script) [data-visible-in~=print] { visibility: visible !important; }
 
 /* Navigation buttons */
 @media print { #nav_btns { display: none; } }

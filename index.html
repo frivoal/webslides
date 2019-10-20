@@ -17,7 +17,7 @@
 	src: url('assets/Anonymous Pro Minus.ttf');
 }
 
-body {
+:root {
 	font-family: "Raleway", sans-serif;
 	font-size: 5vmin;
 }
@@ -159,7 +159,7 @@ pre { font-size: 0.8em; }
 	<p><code>in-foo</code> is removed after transitioning to the following state,
 	but <code>from-foo</code> is kept.
 
-	<p>In stateful mode, the <code>uses-script</code> class is added to the <code>body</code> element.
+	<p>In stateful mode, the <code>uses-script</code> class is added to the <code>html</code> element.
 	It is absent in print mode, non stateful mode, and when JavaScript fails to load.
 
 	<p>These can be used to style elements is the slide as desired.
@@ -191,7 +191,7 @@ pre { font-size: 0.8em; }
 #ex2.in-l4 [data-visible-from=l4] {
 	color: black;
 }
-body:not(.uses-script) #ex2 li { color: black; }
+:root:not(.uses-script) #ex2 li { color: black; }
 </style>
 	<h3>Example 2</h3>
 	<ul>
