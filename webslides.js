@@ -67,8 +67,6 @@ window.addEventListener("DOMContentLoaded", function() {
 		});
 		var styles = "";
 		states.forEach(function(s) {
-			styles += ":root.uses-script .in-"+s+" [data-hidden-in~=\""+s+"\"] { visibility: hidden; }\n";
-			styles += ":root.uses-script .from-"+s+" [data-hidden-from~=\""+s+"\"] { visibility: hidden; }\n";
 			styles += ":root.uses-script .in-"+s+" [data-visible-in~=\""+s+"\"] { visibility: visible; }\n";
 			styles += ":root.uses-script .from-"+s+" [data-visible-from~=\""+s+"\"] { visibility: visible; }\n";
 
