@@ -35,7 +35,8 @@ section {
 }
 
 /* Snapping */
-body {
+:root,
+body /* should not be needed, but doesn't work in safari if missing */ {
 	/* old style */
 	-ms-scroll-snap-type: mandatory;
 	scroll-snap-type: mandatory;
