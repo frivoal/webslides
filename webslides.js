@@ -27,7 +27,6 @@ var webslides = {
 	// take anchor into account
 	currentSlide : null,
 	currentState : null,
-	slides : null,
 	options : {
 		onScreenNav : true,
 		verboseLog : false,
@@ -37,16 +36,28 @@ var webslides = {
 window.addEventListener("DOMContentLoaded", function() {
 	/* State Management */
 	function clearActiveState( element, state ) {
-		element.classList.remove("in-"+state);
-		element.classList.remove("from-"+state);
+		if (state) {
+			state.levelNames().forEach( function(name) {
+				element.classList.remove("in-"+name);
+				element.classList.remove("from-"+name);
+			});
+		}
 	}
 
 	function clearActiveInState( element, state ) {
-		element.classList.remove("in-"+state);
+		if (state) {
+			state.levelNames().forEach( function(name) {
+				element.classList.remove("in-"+name);
+			});
+		}
 	}
 
 	function setInState( element, state ) {
-		element.classList.add("in-" + state);
+		if (state) {
+			state.levelNames().forEach( function(name) {
+				element.classList.add("in-"+name);
+			});
+		}
 	}
 
 	function clearStates( element ) {
@@ -63,45 +74,64 @@ window.addEventListener("DOMContentLoaded", function() {
 	}
 
 	function setFromStates( element, states) {
-		states.forEach(function(state) {
-			element.classList.add("from-" + state);
-		});
+		if (states) {
+			states.forEach(function(state) {
+				state.levelNames().forEach( function(name) {
+					element.classList.add("from-"+name);
+				});
+			});
+		}
 	}
 
 	/* Document preparation */
+	function createState(name) {
+		var subStates = [];
+		var self = {
+			_dbg_n: name,
+			name: function() { return name; },
+			levelNames: function() { return [name]; },
+		}
+		return self;
+	}
 	function createSlide(elem) {
 		var states = [];
+		states.includesState = function(name) {
+			return !! states.find( function(e) {
+				return e.name() == name;
+			});
+		}
+		var savedState = null;
 		var self = {
-			states: states,
-			appendState: function(state, option) {
-				if (state == "print") {
+			_dbg_states: states,
+			appendState: function(name, option) {
+				if (name == "print") {
 						console.warn(`Slide #${elem.id}: 'print' is a reserved state name.`);
 				}
 				if (option instanceof Object &&
 				    option.implicit) {
-					if (!states.includes(state)) {
-						states.push(state);
+					if (!states.includesState(name)) {
+						states.push(createState(name));
 						if (webslides.options.verboseLog){
-							console.log(`Slide #${elem.id}: '${state}' state declared implicitely.`);
+							console.log(`Slide #${elem.id}: '${name}' state declared implicitely.`);
 						}
 					}
 				} else {
-					if (states.includes(state)) {
-						console.warn(`Slide #${elem.id}: '${state}' state declared multiple times.`);
+					if (states.includesState(name)) {
+						console.warn(`Slide #${elem.id}: '${name}' state declared multiple times.`);
 					} else {
-						states.push(state);
+						states.push(createState(name));
 					}
 				}
 			},
-			appendStates: function(states, option){
+			appendStates: function(names, option){
 				var that = this;
-				if (states) {
-					states.split(" ").forEach(function(state) {
-						that.appendState(state, option);
+				if (names) {
+					names.split(" ").forEach(function(name) {
+						that.appendState(name, option);
 					});
 				}
 			},
-			stateNames: function () {
+			states: function () {
 				return states;
 			},
 			lastState: function () {
@@ -109,7 +139,9 @@ window.addEventListener("DOMContentLoaded", function() {
 			},
 			stateAfter: function (currentState) {
 				if (currentState) {
-					var i = states.indexOf(currentState);
+					var i = states.findIndex(function(e) {
+						return e.name() == currentState.name();
+					});
 					if (i != -1) {
 						return states[i+1];
 					}
@@ -118,7 +150,9 @@ window.addEventListener("DOMContentLoaded", function() {
 				}
 			},
 			stateBefore: function (currentState) {
-				var i = states.indexOf(currentState);
+				var i = states.findIndex(function(e) {
+					return e.name() == currentState.name();
+				});
 				return states[i-1];
 			},
 			element: function() {
@@ -127,19 +161,50 @@ window.addEventListener("DOMContentLoaded", function() {
 			id: function() {
 				return elem.id;
 			},
+			saveState: function(state) {
+				savedState = state;
+			},
+			restoreState: function() {
+				webslides.currentState = savedState;
+				if (savedState) {
+					var se = webslides.currentSlide.element();
+					clearStates(se);
+					setInState(se, savedState);
+					for (var s = savedState; s; s = webslides.currentSlide.stateBefore(s)) {
+						setFromStates(se, [s]);
+					}
+				}
+			},
 		}
 		return self;
 	}
 
-	function createSlideTree() {
+	function initSlideTree() {
 		var tree = [];
-		var self = {
-			all: tree,
-			forEachSlide: function(f) { tree.forEach(f); },
-			getSlide: function(sid) { return tree.find(function(e) {return e.id() == sid; }); },
-			slideBefore: function(sid) { return tree[tree.findIndex(function(e) {return e.id() == sid; })-1]; },
-			slideAfter: function(sid) { return tree[tree.findIndex(function(e) {return e.id() == sid; })+1]; },
-		};
+
+		/* Set up Slide Tree APIs*/
+		webslides.forEachSlide = function(f) {
+			tree.forEach(f);
+		}
+		webslides.getSlide = function(sid) {
+			return tree.find(function(e) {
+				return e.id() == sid;
+			});
+		}
+		webslides.slideBefore = function(current) {
+			var i = tree.findIndex(function(e) {
+				return e.id() == current.id();
+			});
+			return tree[i-1];
+		}
+		webslides.slideAfter = function(current) {
+			var i = tree.findIndex(function(e) {
+				return e.id() == current.id();
+			});
+			return tree[i+1];
+		}
+
+		/* Initialize the Slide Tree */
 		var slideElements = document.querySelectorAll("body > section");
 		slideElements.forEach(function(se) {
 			var s = createSlide(se);
@@ -151,17 +216,19 @@ window.addEventListener("DOMContentLoaded", function() {
 				s.appendStates(impliedStates, {implicit: true});
 			});
 		});
-		return self;
 	}
+
 	function generateStateStyle() {
-		var states = new Set();
-		webslides.slides.forEachSlide(function(s) {
-			s.stateNames().forEach(function(state) {
-				states.add(state);
+		var statesNames = new Set();
+		webslides.forEachSlide(function(slide) {
+			slide.states().forEach(function(state) {
+				state.levelNames().forEach(function(name) {
+					statesNames.add(name);
+				});
 			});
 		});
 		var styles = "";
-		states.forEach(function(s) {
+		statesNames.forEach(function(s) {
 			styles += ":root.uses-script .in-"+s+" [data-visible-in~=\""+s+"\"] { visibility: visible; }\n";
 			styles += ":root.uses-script .from-"+s+" [data-visible-from~=\""+s+"\"] { visibility: visible; }\n";
 
@@ -200,13 +267,16 @@ window.addEventListener("DOMContentLoaded", function() {
 	}
 
 	function nextSlide() {
-		var se = webslides.currentSlide.element();
-		if (se.nextElementSibling && se.nextElementSibling.localName == "section" )  {
+		var next = webslides.slideAfter(webslides.currentSlide);
+		if (next)  {
+			webslides.currentSlide.saveState(webslides.currentState);
 			webslides.currentState = null;
-			clearStates(se);
-			setFromStates(se, webslides.currentSlide.stateNames());
 
-			webslides.currentSlide = webslides.slides.getSlide(se.nextElementSibling.id);
+			var se = webslides.currentSlide.element();
+			clearStates(se);
+			setFromStates(se, webslides.currentSlide.states());
+
+			webslides.currentSlide = next;
 			clearStates(webslides.currentSlide.element());
 			var hash = webslides.currentSlide.id();
 			history.pushState(null, document.title+" @ "+hash, "#"+hash);
@@ -219,7 +289,7 @@ window.addEventListener("DOMContentLoaded", function() {
 		if (webslides.currentState) {
 			var se = webslides.currentSlide.element();
 			clearActiveState(se, webslides.currentState);
-			var prev = webslides.slides.getSlide(webslides.currentSlide.id()).stateBefore(webslides.currentState);
+			var prev = webslides.currentSlide.stateBefore(webslides.currentState);
 			webslides.currentState = prev;
 			if (prev) {
 				setFromStates(se, [prev]);
@@ -231,19 +301,20 @@ window.addEventListener("DOMContentLoaded", function() {
 	}
 
 	function prevSlide() {
-		if (webslides.currentSlide.element().previousElementSibling) {
+		var prev = webslides.slideBefore(webslides.currentSlide);
+		if (prev) {
+			webslides.currentSlide.saveState(webslides.currentState);
 			clearStates(webslides.currentSlide.element());
 
-			webslides.currentSlide = webslides.slides.getSlide(webslides.currentSlide.element().previousElementSibling.id);
+			webslides.currentSlide = prev;
 			var se = webslides.currentSlide.element();
-			setFromStates(se, webslides.currentSlide.stateNames());
+			setFromStates(se, webslides.currentSlide.states());
 			webslides.currentState = webslides.currentSlide.lastState();
 			if (webslides.currentState) {
 				setInState(se, webslides.currentState );
 			}
 			var hash = webslides.currentSlide.id();
 			history.pushState(null, document.title+" @ "+hash, "#"+hash);
-
 		}
 		resnap();
 	}
@@ -256,10 +327,10 @@ window.addEventListener("DOMContentLoaded", function() {
 	function initCurrentSlide() {
 		var anchor = document.URL.replace(/^[^#]*#?/, "");
 		if (anchor) {
-			webslides.currentSlide = webslides.slides.getSlide(document.querySelector("body > section#"+anchor).id);
+			webslides.currentSlide = webslides.getSlide(document.querySelector("body > section#"+anchor).id);
 			webslides.currentState = null;
 		} else {
-			webslides.currentSlide = webslides.slides.getSlide(document.querySelector("body > section:first-of-type").id);
+			webslides.currentSlide = webslides.getSlide(document.querySelector("body > section:first-of-type").id);
 			webslides.currentState = null;
 		}
 	}
@@ -271,7 +342,9 @@ window.addEventListener("DOMContentLoaded", function() {
 			var y = slide.getBoundingClientRect().y;
 			if (y < 1 && y > -1) {
 				var hash = slide.id;
-				webslides.currentSlide = webslides.slides.getSlide(hash);
+				webslides.currentSlide.saveState(webslides.currentState);
+				webslides.currentSlide = webslides.getSlide(hash);
+				webslides.currentSlide.restoreState();
 				history.pushState(null, document.title+" @ "+hash, "#"+hash);
 				break;
 			}
@@ -321,12 +394,12 @@ window.addEventListener("DOMContentLoaded", function() {
 
 	/* Init */
 	addSlideNumbers();
-	webslides.slides = createSlideTree();
+	initSlideTree();
 	generateStateStyle();
 	initCurrentSlide();
 	resnap();
 
-	/* API setup */
+	/* Navigation API setup */
 	webslides.next = next;
 	webslides.prev = prev;
 	webslides.nextSlide = nextSlide;
