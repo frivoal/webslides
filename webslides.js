@@ -27,41 +27,128 @@ var webslides = {
 	// take anchor into account
 	currentSlide : null,
 	state : null,
+	slides : null,
 	options : {
 		onScreenNav : true,
+		verboseLog : false,
 	}
 };
 
 window.addEventListener("DOMContentLoaded", function() {
 	/* State Management */
-	function clearInState( element, states) {
-		states.forEach(function(state) {
-			element.classList.remove("in-" + state);
-		});
+	function clearActiveState( element, state ) {
+		element.classList.remove("in-"+state);
+		element.classList.remove("from-"+state);
 	}
 
-	function setInState( element, state) {
+	function clearActiveInState( element, state ) {
+		element.classList.remove("in-"+state);
+	}
+
+	function setInState( element, state ) {
 		element.classList.add("in-" + state);
 	}
 
-	function clearFromState( element, states) {
-		states.forEach(function(state) {
-			element.classList.remove("from-" + state);
+	function clearStates( element ) {
+		var toRemove = new Set();
+		element.classList.forEach( function(c) {
+			if (c.startsWith("from-") ||
+			    c.startsWith("in-")) {
+				toRemove.add(c);
+			}
+		});
+		toRemove.forEach( function(c) {
+			element.classList.remove(c);
 		});
 	}
 
-	function setFromState( element, states) {
+	function setFromStates( element, states) {
 		states.forEach(function(state) {
 			element.classList.add("from-" + state);
 		});
 	}
 
 	/* Document preparation */
+	function createSlide(elem) {
+		var states = [];
+		var self = {
+			states: states,
+			appendState: function(state, option) {
+				if (state == "print") {
+						console.warn(`Slide #${elem.id}: 'print' is a reserved state name.`);
+				}
+				if (option instanceof Object &&
+				    option.implicit) {
+					if (!states.includes(state)) {
+						states.push(state);
+						if (webslides.options.verboseLog){
+							console.log(`Slide #${elem.id}: '${state}' state declared implicitely.`);
+						}
+					}
+				} else {
+					if (states.includes(state)) {
+						console.warn(`Slide #${elem.id}: '${state}' state declared multiple times.`);
+					} else {
+						states.push(state);
+					}
+				}
+			},
+			appendStates: function(states, option){
+				var that = this;
+				if (states) {
+					states.split(" ").forEach(function(state) {
+						that.appendState(state, option);
+					});
+				}
+			},
+			stateNames: function () {
+				return states;
+			},
+			lastState: function () {
+				return states[states.length-1];
+			},
+			stateAfter: function (currentState) {
+				if (currentState) {
+					var i = states.indexOf(currentState);
+					if (i != -1) {
+						return states[i+1];
+					}
+				} else {
+					return states[0];
+				}
+			},
+			stateBefore: function (currentState) {
+				var i = states.indexOf(currentState);
+				return states[i-1];
+			}
+		}
+		return self;
+	}
+
+	function createSlideTree() {
+		var tree = new Map();
+		var self = {
+			all: tree,
+			forEachSlide: function(f) { tree.forEach(f); },
+			getSlide: function(s) { return tree.get(s) },
+		};
+		var slideElements = document.querySelectorAll("body > section");
+		slideElements.forEach(function(se) {
+			var s = createSlide(se);
+			tree.set(se.id, s);
+			var dataStates = se.getAttribute("data-states");
+			s.appendStates(dataStates);
+			se.querySelectorAll("[data-visible-from]", "[data-visible-in]").forEach(function(e) {
+				var impliedStates = "" + e.getAttribute("data-visible-from") || "" + e.getAttribute("data-visible-in") || "";
+				s.appendStates(impliedStates, {implicit: true});
+			});
+		});
+		return self;
+	}
 	function generateStateStyle() {
 		var states = new Set();
-		var es = document.querySelectorAll("[data-states]");
-		es.forEach(function(e) {
-			(e.getAttribute("data-states") || "").split(" ").forEach(function(state) {
+		webslides.slides.forEachSlide(function(s) {
+			s.stateNames().forEach(function(state) {
 				states.add(state);
 			});
 		});
@@ -90,18 +177,14 @@ window.addEventListener("DOMContentLoaded", function() {
 	/* Navigation */
 	function next() {
 		document.documentElement.classList.add("uses-script");
-		var states_string = webslides.currentSlide.getAttribute("data-states") || "";
-		if (states_string)  {
-			var states = states_string.split(" ");
-			var i = states.indexOf(webslides.state) + 1;
-			if (i == states.length) {
-				nextSlide();
-			} else {
-				webslides.state = states[i];
-				clearInState(webslides.currentSlide, states);
-				setInState(webslides.currentSlide, webslides.state);
-				setFromState(webslides.currentSlide, states.slice(0,i+1));
-			}
+
+		var next = webslides.slides.getSlide(webslides.currentSlide.id).stateAfter(webslides.state);
+		if (next) {
+			clearActiveInState(webslides.currentSlide, webslides.state);
+			webslides.state = next;
+			setFromStates(webslides.currentSlide, [webslides.state]);
+			setInState(webslides.currentSlide, webslides.state);
+
 		} else {
 			nextSlide();
 		}
@@ -110,13 +193,11 @@ window.addEventListener("DOMContentLoaded", function() {
 	function nextSlide() {
 		if (webslides.currentSlide.nextElementSibling && webslides.currentSlide.nextElementSibling.localName == "section" )  {
 			webslides.state = null;
-			var states = (webslides.currentSlide.getAttribute("data-states") ||"").split(" ");
-			clearInState(webslides.currentSlide, states);
+			clearStates(webslides.currentSlide);
+			setFromStates(webslides.currentSlide, webslides.slides.getSlide(webslides.currentSlide.id).stateNames());
 
 			webslides.currentSlide = webslides.currentSlide.nextElementSibling;
-			states = (webslides.currentSlide.getAttribute("data-states") ||"").split(" ");
-			clearInState(webslides.currentSlide, states);
-			clearFromState(webslides.currentSlide, states);
+			clearStates(webslides.currentSlide);
 			var hash = webslides.currentSlide.id;
 			history.pushState(null, document.title+" @ "+hash, "#"+hash);
 			resnap();
@@ -125,38 +206,28 @@ window.addEventListener("DOMContentLoaded", function() {
 
 	function prev() {
 		document.documentElement.classList.add("uses-script");
-		var states_string = webslides.currentSlide.getAttribute("data-states") || ""; 
-		if (states_string)  {
-			var states = states_string.split(" ");
-			var i = states.indexOf(webslides.state);
-			if (i == -1) {
-				prevSlide();
-			} else {
-				i = i - 1;
-				webslides.state = states[i] || null;
-				if (webslides.state) {
-					clearInState(webslides.currentSlide, states);
-					clearFromState(webslides.currentSlide, states);
-					setInState(webslides.currentSlide, webslides.state);
-					setFromState(webslides.currentSlide, states.slice(0,i+1))
-				} else {
-					clearInState(webslides.currentSlide, states);
-					clearFromState(webslides.currentSlide, states);
-				}
+		if (webslides.state) {
+			clearActiveState(webslides.currentSlide, webslides.state);
+			var prev = webslides.slides.getSlide(webslides.currentSlide.id).stateBefore(webslides.state);
+			webslides.state = prev;
+			if (prev) {
+				setFromStates(webslides.currentSlide, [prev]);
+				setInState(webslides.currentSlide, prev);
 			}
 		} else {
 			prevSlide();
 		}
 	}
+
 	function prevSlide() {
 		if (webslides.currentSlide.previousElementSibling) {
+			clearStates(webslides.currentSlide);
+
 			webslides.currentSlide = webslides.currentSlide.previousElementSibling;
-			var states_string = webslides.currentSlide.getAttribute("data-states") || "";
-			if (states_string)  {
-				var states = states_string.split(" ");
-				webslides.state = states[states.length - 1];
-				setInState(webslides.currentSlide, webslides.state);
-				setFromState(webslides.currentSlide, states);
+			setFromStates(webslides.currentSlide, webslides.slides.getSlide(webslides.currentSlide.id).stateNames());
+			webslides.state = webslides.slides.getSlide(webslides.currentSlide.id).lastState();
+			if (webslides.state) {
+				setInState(webslides.currentSlide, webslides.state );
 			}
 			var hash = webslides.currentSlide.id;
 			history.pushState(null, document.title+" @ "+hash, "#"+hash);
@@ -238,6 +309,7 @@ window.addEventListener("DOMContentLoaded", function() {
 
 	/* Init */
 	addSlideNumbers();
+	webslides.slides = createSlideTree();
 	generateStateStyle();
 	initCurrentSlide();
 	resnap();
