@@ -26,14 +26,54 @@ SOFTWARE.
 var webslides = {
 	// take anchor into account
 	currentSlide : null,
-	currentState : null,
+	currentPath: null,
 	options : {
 		onScreenNav : true,
-		verboseLog : false,
 	}
 };
 
 window.addEventListener("DOMContentLoaded", function() {
+	function createPath(firstPart) {
+		var path = [firstPart];
+		var self = {
+			_dbg_path: path,
+			push: function(part) {
+				path.push(part);
+			},
+			append: function(subPath) {
+				if (subPath) {
+					subPath.forEach(function(part) {
+						path.push(part);
+					});
+				}
+			},
+			depth: function() { return path.length; },
+			head: function() { return path[0]; },
+			tail: function () {
+				if (path.length >= 2) {
+					var res = createPath(path[1]);
+					path.slice(2).forEach( function(p) {
+						res.push(p);
+					});
+					return res;
+				} else {
+					return null;
+				}
+			},
+			forEach: function(f) { path.forEach(f); },
+			flatten: function() {
+				return path.reduceRight(function(acc, e) {
+					var flats = acc.map(function(a){
+						return e.concat("_", a);
+					});
+					flats.push(e);
+					return flats;
+				},[]);
+			},
+		}
+		return self;
+	}
+
 	/* Document preparation */
 	function createNameTree(name) {
 		var tree = [];
@@ -50,33 +90,107 @@ window.addEventListener("DOMContentLoaded", function() {
 				}
 				return child;
 			},
+			addGenerations: function(child, nextGens) {
+				var c = self.addChild(child);
+				if(nextGens) {
+					nextGens.forEach( function(nextGen) {
+						if (nextGen[0]) {
+							c.addGenerations(nextGen[0], nextGen[1]);
+						}
+					});
+				}
+			},
 			forEach: function(f) { tree.forEach(f); },
+			getChild: function(name) {
+				return tree.find(function(e) {
+					return e.name() == name;
+				});
+			},
+			childBefore: function(current) {
+				var i = tree.findIndex(function(e) {
+					return e.name() == current;
+				});
+				return tree[i-1];
+			},
 			childAfter: function (current) {
 				if (current) {
 					var i = tree.findIndex(function(e) {
-						return e.name() == current.name();
+						return e.name() == current;
 					});
 					return tree[i+1];
 				} else {
 					return tree[0];
 				}
 			},
-			getChild: function(name) {
-				return tree.find(function(e) {
-					return e.name() == name;
+			pathBefore: function(current) {
+				if (current.depth() >= 2) {
+					var tailBefore = self.getChild(current.head()).pathBefore(current.tail());
+					if (tailBefore) {
+						var path = createPath(current.head());
+						path.append(tailBefore);
+						return path;
+					}
+				}
+				/* depth() == 1 || tailBefore == null */
+				var prev = self.childBefore(current.head());
+				if (prev) {
+					var path = createPath(prev.name());
+					path.append(prev.lastPath());
+					return path;
+				} else {
+					return null;
+				}
+			},
+			pathAfter: function(current) {
+				if (current) {
+					if (current.depth() >= 2) {
+						var tailAfter = self.getChild(current.head()).pathAfter(current.tail());
+						if (tailAfter) {
+							var path = createPath(current.head());
+							path.append(tailAfter);
+							return path;
+						}
+					}
+					/* depth() == 1 || tailAfter == null */
+					var next = self.childAfter(current.head());
+					if (next) {
+						var path = createPath(next.name());
+						path.append(next.firstPath());
+						return path;
+					} else {
+						return null;
+					}
+				} else {
+					return self.firstPath();
+				}
+			},
+			firstPath: function () {
+				if (tree.length == 0)  { return null; }
+
+				var fc = tree[0];
+				var path = createPath(fc.name());
+				path.append(fc.firstPath());
+
+				return path;
+			},
+			lastPath: function () {
+				if (tree.length == 0)  { return null; }
+
+				var lc = tree[tree.length-1];
+				var path = createPath(lc.name());
+				path.append(lc.lastPath());
+
+				return path;
+			},
+			flatten: function() {
+				var names = [name];
+				this.forEach( function(sub) {
+					var subNames = sub.flatten();
+					subNames.forEach( function(subName) {
+						names.push(name+"_"+subName);
+					});
 				});
-			},
-			childBefore: function (current) {
-				var i = tree.findIndex(function(e) {
-					return e.name() == current.name();
-				});
-				return tree[i-1];
-			},
-			lastChild: function () {
-				return tree[tree.length-1];
-			},
-			fullPaths: function() {
-				return [name];
+				return names;
 			},
 		}
 		return self;
@@ -90,7 +204,7 @@ window.addEventListener("DOMContentLoaded", function() {
 		}
 		self.clearActiveState = function(state) {
 			if (state) {
-				state.fullPaths().forEach( function(name) {
+				state.flatten().forEach( function(name) {
 					slideElement().classList.remove("in-"+name);
 					slideElement().classList.remove("from-"+name);
 				});
@@ -98,7 +212,7 @@ window.addEventListener("DOMContentLoaded", function() {
 		}
 		self.clearActiveInState = function(state) {
 			if (state) {
-				state.fullPaths().forEach( function(name) {
+				state.flatten().forEach( function(name) {
 					slideElement().classList.remove("in-"+name);
 				});
 			}
@@ -117,7 +231,7 @@ window.addEventListener("DOMContentLoaded", function() {
 		}
 		self.setInState = function(state) {
 			if (state) {
-				state.fullPaths().forEach( function(name) {
+				state.flatten().forEach( function(name) {
 					slideElement().classList.add("in-"+name);
 				});
 			}
@@ -125,22 +239,22 @@ window.addEventListener("DOMContentLoaded", function() {
 		self.setFromStates = function(opt_states) {
 			var states = opt_states || self;
 			states.forEach(function(state) {
-				state.fullPaths().forEach( function(name) {
+				state.flatten().forEach( function(name) {
 					slideElement().classList.add("from-"+name);
 				});
 			});
 		}
-		var savedState = null;
-		self.saveState = function(state) {
-			savedState = state;
+		var savedPath = null;
+		self.savePath = function(path) {
+			savedPath = path;
 		}
-		self.restoreState = function() {
-			webslides.currentState = savedState;
-			if (savedState) {
+		self.restorePath = function() {
+			webslides.currentPath = savedPath;
+			if (savedPath) {
 				self.clearStates();
-				self.setInState(savedState);
-				for (var s = savedState; s; s = webslides.currentSlide.childBefore(s)) {
-					self.setFromStates([s]);
+				self.setInState(savedPath);
+				for (var p = savedPath; p; p = webslides.currentSlide.pathBefore(p)) {
+					self.setFromStates([p]);
 				}
 			}
 		}
@@ -152,7 +266,6 @@ window.addEventListener("DOMContentLoaded", function() {
 
 		return self;
 	}
-
 
 	function initSlideTree() {
 		var slideTree = createNameTree("root");
@@ -169,8 +282,10 @@ window.addEventListener("DOMContentLoaded", function() {
 			var s = slideTree.addChild(se.id, createSlide);
 			var dataStates = se.getAttribute("data-states");
 			if (dataStates) {
-				dataStates.split(" ").forEach(function(name) {
-					s.addChild(name);
+				dataStates.split(" ").forEach(function(path) {
+					var parts = path.split("_");
+					var generations = parts.reduceRight(function (acc, cur) { return [ cur, [acc] ]; }, [] );
+					s.addGenerations(generations[0], generations[1]);
 				});
 			}
 		});
@@ -180,7 +295,7 @@ window.addEventListener("DOMContentLoaded", function() {
 		var statesNames = new Set();
 		webslides.forEach(function(slide) {
 			slide.forEach(function(state) {
-				state.fullPaths().forEach(function(name) {
+				state.flatten().forEach(function(name) {
 					statesNames.add(name);
 				});
 			});
@@ -211,12 +326,12 @@ window.addEventListener("DOMContentLoaded", function() {
 	function next() {
 		document.documentElement.classList.add("uses-script");
 
-		var next = webslides.currentSlide.childAfter(webslides.currentState);
+		var next = webslides.currentSlide.pathAfter(webslides.currentPath);
 		if (next) {
-			webslides.currentSlide.clearActiveInState(webslides.currentState);
-			webslides.currentState = next;
-			webslides.currentSlide.setFromStates([webslides.currentState]);
-			webslides.currentSlide.setInState(webslides.currentState);
+			webslides.currentSlide.clearActiveInState(webslides.currentPath);
+			webslides.currentPath = next;
+			webslides.currentSlide.setFromStates([webslides.currentPath]);
+			webslides.currentSlide.setInState(webslides.currentPath);
 
 		} else {
 			nextSlide();
@@ -224,11 +339,16 @@ window.addEventListener("DOMContentLoaded", function() {
 	}
 
 	function nextSlide() {
-		var next = webslides.slideAfter(webslides.currentSlide);
+		var next;
+		if (webslides.currentSlide) {
+			next = webslides.slideAfter(webslides.currentSlide.name());
+		} else {
+			next = webslides.slideAfter(null);
+		}
 		if (next)  {
 			if (webslides.currentSlide) {
-				webslides.currentSlide.saveState(webslides.currentState);
-				webslides.currentState = null;
+				webslides.currentSlide.savePath(webslides.currentPath);
+				webslides.currentPath = null;
 
 				webslides.currentSlide.clearStates();
 				webslides.currentSlide.setFromStates();
@@ -244,30 +364,30 @@ window.addEventListener("DOMContentLoaded", function() {
 
 	function prev() {
 		document.documentElement.classList.add("uses-script");
-		if (webslides.currentState) {
-			webslides.currentSlide.clearActiveState(webslides.currentState);
-			var prev = webslides.currentSlide.childBefore(webslides.currentState);
+		if (webslides.currentPath) {
+			webslides.currentSlide.clearActiveState(webslides.currentPath);
+			var prev = webslides.currentSlide.pathBefore(webslides.currentPath);
 			if (prev) {
 				webslides.currentSlide.setFromStates([prev]);
 				webslides.currentSlide.setInState(prev);
 			}
-			webslides.currentState = prev;
+			webslides.currentPath = prev;
 		} else {
 			prevSlide();
 		}
 	}
 
 	function prevSlide() {
-		var prev = webslides.slideBefore(webslides.currentSlide);
+		var prev = webslides.slideBefore(webslides.currentSlide.name());
 		if (prev) {
-			webslides.currentSlide.saveState(webslides.currentState);
+			webslides.currentSlide.savePath(webslides.currentPath);
 			webslides.currentSlide.clearStates();
 
 			webslides.currentSlide = prev;
 			webslides.currentSlide.setFromStates();
-			webslides.currentState = webslides.currentSlide.lastChild();
-			if (webslides.currentState) {
-				webslides.currentSlide.setInState(webslides.currentState );
+			webslides.currentPath = webslides.currentSlide.lastPath();
+			if (webslides.currentPath) {
+				webslides.currentSlide.setInState(webslides.currentPath );
 			}
 			var hash = webslides.currentSlide.name();
 			history.pushState(null, document.title+" @ "+hash, "#"+hash);
@@ -297,9 +417,9 @@ window.addEventListener("DOMContentLoaded", function() {
 			var y = slide.getBoundingClientRect().y;
 			if (y < 1 && y > -1) {
 				var hash = slide.id;
-				webslides.currentSlide.saveState(webslides.currentState);
+				webslides.currentSlide.savePath(webslides.currentPath);
 				webslides.currentSlide = webslides.getSlide(hash);
-				webslides.currentSlide.restoreState();
+				webslides.currentSlide.restorePath();
 				history.pushState(null, document.title+" @ "+hash, "#"+hash);
 				break;
 			}
