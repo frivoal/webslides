@@ -168,7 +168,7 @@ window.addEventListener("DOMContentLoaded", function() {
 		for (var i = 0; i < slides.length; i++) {
 			if (!slides[i].id) {
 				slides[i].id="slide_"+i;
-				console.warn("Side number "+i+" does not have an id. Autogenerating one. Manually add an id to be able to link to this slide when javascript is off.");
+				console.warn(`Slide number ${i} does not have an id. Autogenerating one. Manually add an id to be able to link to this slide when javascript is off.`);
 			}
 		}
 	}
