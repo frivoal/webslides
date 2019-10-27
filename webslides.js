@@ -90,15 +90,20 @@ window.addEventListener("DOMContentLoaded", function() {
 				}
 				return child;
 			},
-			addGenerations: function(child, nextGens) {
-				var c = self.addChild(child);
-				if(nextGens) {
-					nextGens.forEach( function(nextGen) {
-						if (nextGen[0]) {
-							c.addGenerations(nextGen[0], nextGen[1]);
-						}
-					});
-				}
+			addDescendants: function(desc) {
+				var head = desc[0];
+				var tail = desc.slice(1);
+				if (typeof head == "string") {
+					var c = self.addChild(head);
+					if (tail.length > 0) {
+						c.addDescendants(tail);
+					}
+				} else if (typeof head == "number") {
+					for (var i = 1; i <= head; i++) {
+						self.addChild(`${i}`);
+					}
+					if (tail.length > 0) { throw "error: a number must be the last descendant"; }
+				} else { throw "error: needs string or number"; }
 			},
 			forEach: function(f) { tree.forEach(f); },
 			getChild: function(name) {
@@ -276,38 +281,56 @@ window.addEventListener("DOMContentLoaded", function() {
 		webslides.slideBefore = slideTree.childBefore;
 		webslides.slideAfter = slideTree.childAfter;
 
-		/* Initialize the Slide Tree */
+		/* Initialize the Slide Tree, and gather the style rules as we go along */
+
+		function generateVisibleStyle(ruleSet, slide) {
+			slide.forEach(function(stateTree) {
+				stateTree.flatten().forEach(function(s) {
+					ruleSet.add(`:root.uses-script .in-${s} [data-visible-in~="${s}"] { visibility: visible; }\n`);
+					ruleSet.add(`:root.uses-script .from-${s} [data-visible-from~="${s}"] { visibility: visible; }\n`);
+				});
+			});
+		}
+		function generateRevealStyle(ruleSet, slideName, path, count) {
+			for (var i = 1; i <= count; i++) {
+				if (path) {
+					ruleSet.add(`:root.uses-script body > section#${slideName}.from-${path}_${i} [data-reveal~="${path}"] > :nth-child(${i}) { visibility: visible; }\n`);
+				} else {
+					ruleSet.add(`:root.uses-script body > section#${slideName}.from-${i} [data-reveal] > :nth-child(${i}) { visibility: visible; }\n`);
+				}
+			}
+		}
+
 		var slideElements = document.querySelectorAll("body > section");
+		var styleRules = new Set();
 		slideElements.forEach(function(se) {
 			var s = slideTree.addChild(se.id, createSlide);
 			var dataStates = se.getAttribute("data-states");
 			if (dataStates) {
 				dataStates.split(" ").forEach(function(path) {
-					var parts = path.split("_");
-					var generations = parts.reduceRight(function (acc, cur) { return [ cur, [acc] ]; }, [] );
-					s.addGenerations(generations[0], generations[1]);
+					s.addDescendants(path.split("_"));
 				});
 			}
-		});
-	}
 
-	function generateStateStyle() {
-		var statesNames = new Set();
-		webslides.forEach(function(slide) {
-			slide.forEach(function(state) {
-				state.flatten().forEach(function(name) {
-					statesNames.add(name);
-				});
+			se.querySelectorAll("[data-reveal]").forEach(function(r) {
+				var path = r.getAttribute("data-reveal");
+				var count = r.children.length;
+				var parts;
+				if (path) {
+					parts = path.split("_");
+				} else {
+					parts = [];
+				}
+				parts.push(count);
+				s.addDescendants(parts);
+				generateRevealStyle(styleRules, s.name(), path, count);
 			});
-		});
-		var styles = "";
-		statesNames.forEach(function(s) {
-			styles += ":root.uses-script .in-"+s+" [data-visible-in~=\""+s+"\"] { visibility: visible; }\n";
-			styles += ":root.uses-script .from-"+s+" [data-visible-from~=\""+s+"\"] { visibility: visible; }\n";
-
+			generateVisibleStyle(styleRules, s);
 		});
 		var style_elm = document.createElement("style");
-		style_elm.innerHTML = styles;
+		styleRules.forEach(function(rule) {
+			style_elm.innerHTML += rule;
+		});
 		document.head.append(style_elm);
 	}
 
@@ -470,7 +493,6 @@ window.addEventListener("DOMContentLoaded", function() {
 	/* Init */
 	addSlideNumbers();
 	initSlideTree();
-	generateStateStyle();
 	initCurrentSlide();
 
 	/* Navigation API setup */

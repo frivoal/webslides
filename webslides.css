@@ -57,6 +57,7 @@ section {
 
 /* State management */
 :root.uses-script [data-visible-from],
+:root.uses-script [data-reveal] > *,
 [data-visible-in] {
 	visibility: hidden;
 }
@@ -65,7 +66,7 @@ section {
 		visibility: visible !important;
 	}
 	[data-visible-from] { visibility: visible !important; }
-	[data-hidden-in~=print] { visibility: hidden !important; }
+	[data-reveal] > * { visibility: visible !important; }
 }
 :root:not(.uses-script) [data-visible-in~=print] { visibility: visible !important; }
 
