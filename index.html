@@ -137,12 +137,69 @@ pre { font-size: 0.8em; }
 	<p>Elements with <code>data-visible-in="foo bar"</code> are initially hidden,
 	and revealed when the slide is in state <code>foo</code> or <code>bar</code>,
 	but not any other states.
+
+	<p>This is very flexible,
+	and allows you to show / hide multiple elements at the same time,
+	or to have order in which they are revealed be different from the document order.
+
+</section>
+
+<section id=sub-states>
+	<h3>Sub-States</h3>
+
+	<p>States can be nested.
+	<code>data-states="a b b_x b_y c"</code>
+	declares 3 states (<code>a</code>, <code>b</code>, and <code>c</code>),
+	as well as two sub-states (<code>x</code> and <code>y</code>) of the second state.
+	Note the usage of the underscore as separator in the state and sub-state name.
+
+	<p>The order in which the states and substates will be activated is:
+	<ol>
+		<li><code>a</code>
+		<li><code>b</code> and <code>b_x</code>
+		<li><code>b</code> and <code>b_y</code>
+		<li><code>c</code>
+	</ol>
+
+</section>
+
+<section id=reveal>
+	<h3>Progressively revealing children</h3>
+
+	<p>Using <code>data-visible-from</code> or <code>data-visible-in</code>
+	is tedious for the common case
+	of progressively revealing elements of a list.
+
+	<p>For that case,
+	use <code>data-reveal="foo"</code>
+	on an element,
+	and the direct children of that element will be shown one by one
+	when the slide is in state <code>foo</code>,
+	and remain visible once the slide is in a state after <code>foo</code>.
+
+	<p>You should still declare <code>foo</code> using <code>data-states="foo"</code>,
+	but implicit sub-states (<code>foo_1</code>, <code>foo_2</code>…) will be created.
+</section>
+
+<section id=reveal-continued>
+	<h3>Progressively revealing children—Continued</h3>
+
+	<p>It is also possible to use <code>data-reveal</code> without specifying a state.
+	In that case,
+	the list will be progressively revealed
+	after all explicit states,
+	using implicit top-level states (<code>1</code>, <code>2</code>…)
+
+	<p>If multiple elements use <code>data-reveal</code> with the same state,
+	or without state,
+	they will be shown in parallel.
 </section>
 
 <section id=printing>
 	<h3>Printing</h3>
 
 	<p>Elements width <code>data-visible-from</code>
+	and width <code>data-reveal</code>
 	(but not those with <code>data-visible-in</code>)
 	are also displayed when printing or when the stateful mode is not activated
 	(see <a href="#state-transitions">State Transitions</a>).
@@ -172,28 +229,76 @@ pre { font-size: 0.8em; }
 	</div>
 </section>
 
-<section data-states="l1 l2 l3 l4" id=ex1>
-	<h3>Example 1</h3>
+<section data-states="first l1 l2 l3 l4 last" id=ex-states>
+	<h3>Using States</h3>
+	<p data-visible-from=first>Here is how to
 	<ul>
-		<li data-visible-from=l1>Progressively
+		<li data-visible-from=l1>progressively
 		<li data-visible-from=l2>reveal
 		<li data-visible-from=l3>list
-		<li data-visible-from=l4>items
+		<li data-visible-from=l4>items.
+	</ul>
+	<p data-visible-from=last>Easy?
+</section>
+
+<section id=ex-reveal>
+	<h3>Revealing List Items</h3>
+	<ul data-reveal>
+		<li>Progressively
+		<li>reveal
+		<li>list
+		<li>items.
 	</ul>
 </section>
 
-<section data-states="l1 l2 l3 l4" id=ex2>
+<section data-states="first l last" id=ex-reveal-explicit>
+	<h3>Revealing at an Explicit State</h3>
+	<p data-visible-from=first>Here is how to
+	<ul data-reveal=l>
+		<li>Progressively
+		<li>reveal
+		<li>list
+		<li>items.
+	</ul>
+	<ul data-reveal=l>
+		<li>Implicitly!
+		<li>In Parallel!
+	</ul>
+	<p data-visible-from=last>Easy?
+</section>
+
+
+<section data-states="l_1 l_2 l_3 l_3_1 l_3_2 l_3_3 l_4" id=ex-sub>
 <style>
-#ex2 li { color: gray; }
-#ex2.in-l1 [data-visible-from=l1],
-#ex2.in-l2 [data-visible-from=l2],
-#ex2.in-l3 [data-visible-from=l3],
-#ex2.in-l4 [data-visible-from=l4] {
+#ex-sub.in-l_3 ol { background: pink; }
+</style>
+	<h3>Revealing list and using Sub-States</h3>
+	<p data-visible-from=l>How about some sub-states?
+	<ul data-reveal=l>
+		<li>progressively
+		<li>reveal
+		<li>list
+			<ol data-reveal="l_3">
+				<li>even
+				<li>nested
+				<li>ones
+			</ol>
+		<li>items.
+	</ul>
+</section>
+
+<section data-states="l1 l2 l3 l4" id=ex-styling>
+<style>
+#ex-styling li { color: gray; }
+#ex-styling.in-l1 [data-visible-from=l1],
+#ex-styling.in-l2 [data-visible-from=l2],
+#ex-styling.in-l3 [data-visible-from=l3],
+#ex-styling.in-l4 [data-visible-from=l4] {
 	color: black;
 }
-:root:not(.uses-script) #ex2 li { color: black; }
+:root:not(.uses-script) #ex-styling li { color: black; }
 </style>
-	<h3>Example 2</h3>
+	<h3>Explicitly Style States</h3>
 	<ul>
 		<li data-visible-from=l1>Progressively reveal
 		<li data-visible-from=l2>list items.
@@ -202,14 +307,14 @@ pre { font-size: 0.8em; }
 	</ul>
 </section>
 
-<section id=ex3>
+<section id=ex-free-style>
 <style>
-#ex3 { writing-mode: vertical-rl; }
-#ex3 h3 { text-orientation: upright; }
-#ex3 div { margin: auto; }
+#ex-free-style { writing-mode: vertical-rl; }
+#ex-free-style h3 { text-orientation: upright; }
+#ex-free-style div { margin: auto; }
 </style>
 <div>
-	<h3>Example 3</h3>
+	<h3>Styling Freedom</h3>
 
 	<p>You can mix writing modes as well,
 	no sweat.
@@ -217,13 +322,13 @@ pre { font-size: 0.8em; }
 </div>
 </section>
 
-<section id=ex4 data-states="t1 t2 t3">
+<section id=ex-complex data-states="t1 t2 t3">
 <style>
-#ex4 table { border-collapse: collapse; }
-#ex4 td, #ex4 th { border: solid 2px; }
-#ex4.in-t2 tr:nth-child(2) { background: lightpink; }
+#ex-complex table { border-collapse: collapse; }
+#ex-complex td, #ex-complex th { border: solid 2px; }
+#ex-complex.in-t2 tr:nth-child(2) { background: lightpink; }
 </style>
-	<h3>Example 4</h3>
+	<h3>Revealing and Highlighting Complex Markup</h3>
 
 	<table>
 		<tr>
@@ -238,9 +343,9 @@ pre { font-size: 0.8em; }
 	</table>
 </section>
 
-<section id=ex5 data-states="anim1 anim2 stop">
+<section id=ex-anim data-states="anim1 anim2 stop">
 <style>
-#ex5 div {
+#ex-anim div {
 	border: solid 50px;
 	border-radius: 50px;
 	border-top-color: blue;
@@ -257,11 +362,11 @@ pre { font-size: 0.8em; }
 	right: 0;
 	top: 0;
 }
-#ex5.in-anim1 #a1,
-#ex5.in-anim2 #a1 {
+#ex-anim.in-anim1 #a1,
+#ex-anim.in-anim2 #a1 {
 	animation: spin 2s linear infinite;
 }
-#ex5.in-anim2 #a2 {
+#ex-anim.in-anim2 #a2 {
 	animation: bounce 1s ease-in-out infinite alternate;
 }
 @keyframes spin {
@@ -273,7 +378,7 @@ pre { font-size: 0.8em; }
   to { height: 50vh; }
 }
 </style>
-	<h3>Example 5</h3>
+	<h3>Controlling Animations</h3>
 
 	<ul>
 		<li data-visible-from=anim1>Animation 1 starts
