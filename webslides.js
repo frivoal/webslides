@@ -291,14 +291,72 @@ window.addEventListener("DOMContentLoaded", function() {
 				});
 			});
 		}
-		function generateRevealStyle(ruleSet, slideName, path, count) {
+		function generateRevealStyle(ruleSet, slideName, path, count, host) {
 			for (var i = 1; i <= count; i++) {
 				if (path) {
-					ruleSet.add(`:root.uses-script body > section#${slideName}.from-${path}_${i} [data-reveal~="${path}"] > :nth-child(${i}) { visibility: visible; }\n`);
+					if (host) {
+						ruleSet.add(`:root.uses-script body > section#${slideName}.from-${path}_${i} > ${host} > :nth-child(${i}) { visibility: visible; }\n`);
+					} else {
+						ruleSet.add(`:root.uses-script body > section#${slideName}.from-${path}_${i} [data-reveal~="${path}"] > :nth-child(${i}) { visibility: visible; }\n`);
+					}
 				} else {
-					ruleSet.add(`:root.uses-script body > section#${slideName}.from-${i} [data-reveal] > :nth-child(${i}) { visibility: visible; }\n`);
+					ruleSet.add(`:root.uses-script body > section#${slideName}.from-${i} > ${host} > :nth-child(${i}) { visibility: visible; }\n`);
 				}
 			}
+		}
+		function getSelectorInSlide(elem, slide) {
+			let path;
+			while (elem) {
+				let subSelector = elem.localName;
+				if (!subSelector || elem == slide) {
+					break;
+				}
+				subSelector = subSelector.toLowerCase();
+
+				const parent = elem.parentElement;
+
+				if (parent) {
+					const sameTagSiblings = parent.children;
+					if (sameTagSiblings.length > 1) {
+						let nameCount = 0;
+						const index = [...sameTagSiblings].findIndex((child) => {
+							if (elem.localName === child.localName) {
+								nameCount++;
+							}
+							return child === elem;
+						}) + 1;
+						if (index > 1 && nameCount > 1) {
+							subSelector += ':nth-child(' + index + ')';
+						}
+					}
+				}
+
+				path = subSelector + (path ? '>' + path : '');
+				elem = parent;
+			}
+			return path;
+		}
+		function findHostPath(elem) {
+			do {
+				var p = elem.parentElement;
+				if (p.hasAttribute("data-reveal")) {
+					var reveal = p.getAttribute("data-reveal");
+					for (var i = 0; elem; elem=elem.previousSibling) {
+						i++;
+					}
+					if (reveal) {
+						return `${reveal}_${i-1}`;
+					} else {
+						var parentPath = findHostPath(p);
+						if (parentPath) {
+							return `${findHostPath(p)}_${i-1}`;
+						} else {
+							return `${i-1}`;
+						}
+					}
+				}
+				elem = p;
+			} while( elem != document.body);
 		}
 
 		var slideElements = document.querySelectorAll("body > section");
@@ -316,6 +374,11 @@ window.addEventListener("DOMContentLoaded", function() {
 				var path = r.getAttribute("data-reveal");
 				var count = r.children.length;
 				var parts;
+				var host;
+				if (!path) {
+					host = getSelectorInSlide(r, se);
+					path = findHostPath(r);
+				}
 				if (path) {
 					parts = path.split("_");
 				} else {
@@ -323,7 +386,7 @@ window.addEventListener("DOMContentLoaded", function() {
 				}
 				parts.push(count);
 				s.addDescendants(parts);
-				generateRevealStyle(styleRules, s.name(), path, count);
+				generateRevealStyle(styleRules, s.name(), path, count, host);
 			});
 			generateVisibleStyle(styleRules, s);
 		});
