@@ -376,7 +376,7 @@ window.addEventListener("DOMContentLoaded", function() {
 					parts = [];
 				}
 				parts.push(count);
-				s.addDescendants(parts, path ? 0 : 1);
+				s.addDescendants(parts, (path && host) ? 0 : 1);
 				generateRevealStyle(styleRules, s.name(), path, count, host);
 			});
 			generateVisibleStyle(styleRules, s);
