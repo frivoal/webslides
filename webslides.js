@@ -42,9 +42,7 @@ window.addEventListener("DOMContentLoaded", function() {
 			},
 			append: function(subPath) {
 				if (subPath) {
-					subPath.forEach(function(part) {
-						path.push(part);
-					});
+					subPath.forEach(part => { path.push(part); });
 				}
 			},
 			depth: function() { return path.length; },
@@ -52,9 +50,7 @@ window.addEventListener("DOMContentLoaded", function() {
 			tail: function () {
 				if (path.length >= 2) {
 					var res = createPath(path[1]);
-					path.slice(2).forEach( function(p) {
-						res.push(p);
-					});
+					path.slice(2).forEach(p => { res.push(p); });
 					return res;
 				} else {
 					return null;
@@ -62,10 +58,8 @@ window.addEventListener("DOMContentLoaded", function() {
 			},
 			forEach: function(f) { path.forEach(f); },
 			flatten: function() {
-				return path.reduceRight(function(acc, e) {
-					var flats = acc.map(function(a){
-						return e.concat("_", a);
-					});
+				return path.reduceRight((acc, e) => {
+					var flats = acc.map(a => e.concat("_", a));
 					flats.push(e);
 					return flats;
 				},[]);
@@ -83,7 +77,7 @@ window.addEventListener("DOMContentLoaded", function() {
 			name: function() { return name; },
 			addChild: function(name, opt_constructor) {
 				var create = opt_constructor || createNameTree;
-				var child = self.getChild(name)
+				var child = this.getChild(name)
 				if (!child) {
 					child = create(name);
 					tree.push(child);
@@ -94,13 +88,13 @@ window.addEventListener("DOMContentLoaded", function() {
 				var head = desc[0];
 				var tail = desc.slice(1);
 				if (typeof head == "string") {
-					var c = self.addChild(head);
+					var c = this.addChild(head);
 					if (tail.length > 0) {
 						c.addDescendants(tail, index);
 					}
 				} else if (typeof head == "number") {
 					for (var i = index; i <= head; i++) {
-						self.addChild(`${i}`);
+						this.addChild(`${i}`);
 					}
 					if (tail.length > 0) { throw "error: a number must be the last descendant"; }
 				} else { throw "error: needs string or number"; }
@@ -129,7 +123,7 @@ window.addEventListener("DOMContentLoaded", function() {
 			},
 			pathBefore: function(current) {
 				if (current.depth() >= 2) {
-					var tailBefore = self.getChild(current.head()).pathBefore(current.tail());
+					var tailBefore = this.getChild(current.head()).pathBefore(current.tail());
 					if (tailBefore) {
 						var path = createPath(current.head());
 						path.append(tailBefore);
@@ -137,7 +131,7 @@ window.addEventListener("DOMContentLoaded", function() {
 					}
 				}
 				/* depth() == 1 || tailBefore == null */
-				var prev = self.childBefore(current.head());
+				var prev = this.childBefore(current.head());
 				if (prev) {
 					var path = createPath(prev.name());
 					path.append(prev.lastPath());
@@ -149,7 +143,7 @@ window.addEventListener("DOMContentLoaded", function() {
 			pathAfter: function(current) {
 				if (current) {
 					if (current.depth() >= 2) {
-						var tailAfter = self.getChild(current.head()).pathAfter(current.tail());
+						var tailAfter = this.getChild(current.head()).pathAfter(current.tail());
 						if (tailAfter) {
 							var path = createPath(current.head());
 							path.append(tailAfter);
@@ -157,7 +151,7 @@ window.addEventListener("DOMContentLoaded", function() {
 						}
 					}
 					/* depth() == 1 || tailAfter == null */
-					var next = self.childAfter(current.head());
+					var next = this.childAfter(current.head());
 					if (next) {
 						var path = createPath(next.name());
 						path.append(next.firstPath());
@@ -166,7 +160,7 @@ window.addEventListener("DOMContentLoaded", function() {
 						return null;
 					}
 				} else {
-					return self.firstPath();
+					return this.firstPath();
 				}
 			},
 			firstPath: function () {
@@ -189,10 +183,10 @@ window.addEventListener("DOMContentLoaded", function() {
 			},
 			flatten: function() {
 				var names = [name];
-				this.forEach( function(sub) {
+				this.forEach(sub => {
 					var subNames = sub.flatten();
-					subNames.forEach( function(subName) {
-						names.push(name+"_"+subName);
+					subNames.forEach(subName => {
+						names.push(`${name}_${subName}`);
 					});
 				});
 				return names;
@@ -209,43 +203,43 @@ window.addEventListener("DOMContentLoaded", function() {
 		}
 		self.clearActiveState = function(state) {
 			if (state) {
-				state.flatten().forEach( function(name) {
-					slideElement().classList.remove("in-"+name);
-					slideElement().classList.remove("from-"+name);
+				state.flatten().forEach(name => {
+					slideElement().classList.remove(`in-${name}`);
+					slideElement().classList.remove(`from-${name}`);
 				});
 			}
 		}
 		self.clearActiveInState = function(state) {
 			if (state) {
-				state.flatten().forEach( function(name) {
-					slideElement().classList.remove("in-"+name);
+				state.flatten().forEach(name => {
+					slideElement().classList.remove(`in-${name}`);
 				});
 			}
 		}
 		self.clearStates = function() {
 			var toRemove = new Set();
-			slideElement().classList.forEach( function(c) {
+			slideElement().classList.forEach(c => {
 				if (c.startsWith("from-") ||
 					c.startsWith("in-")) {
 					toRemove.add(c);
 				}
 			});
-			toRemove.forEach( function(c) {
+			toRemove.forEach(c => {
 				slideElement().classList.remove(c);
 			});
 		}
 		self.setInState = function(state) {
 			if (state) {
-				state.flatten().forEach( function(name) {
-					slideElement().classList.add("in-"+name);
+				state.flatten().forEach(name => {
+					slideElement().classList.add(`in-${name}`);
 				});
 			}
 		}
 		self.setFromStates = function(opt_states) {
-			var states = opt_states || self;
-			states.forEach(function(state) {
-				state.flatten().forEach( function(name) {
-					slideElement().classList.add("from-"+name);
+			var states = opt_states || this;
+			states.forEach(state => {
+				state.flatten().forEach(name => {
+					slideElement().classList.add(`from-${name}`);
 				});
 			});
 		}
@@ -256,10 +250,10 @@ window.addEventListener("DOMContentLoaded", function() {
 		self.restorePath = function() {
 			webslides.currentPath = savedPath;
 			if (savedPath) {
-				self.clearStates();
-				self.setInState(savedPath);
+				this.clearStates();
+				this.setInState(savedPath);
 				for (var p = savedPath; p; p = webslides.currentSlide.pathBefore(p)) {
-					self.setFromStates([p]);
+					this.setFromStates([p]);
 				}
 			}
 		}
@@ -284,8 +278,8 @@ window.addEventListener("DOMContentLoaded", function() {
 		/* Initialize the Slide Tree, and gather the style rules as we go along */
 
 		function generateVisibleStyle(ruleSet, slide) {
-			slide.forEach(function(stateTree) {
-				stateTree.flatten().forEach(function(s) {
+			slide.forEach(stateTree => {
+				stateTree.flatten().forEach(s => {
 					ruleSet.add(`:root.uses-script .in-${s} [data-visible-in~="${s}"] { visibility: visible; }\n`);
 					ruleSet.add(`:root.uses-script .from-${s} [data-visible-from~="${s}"] { visibility: visible; }\n`);
 				});
@@ -326,7 +320,7 @@ window.addEventListener("DOMContentLoaded", function() {
 							return child === elem;
 						}) + 1;
 						if (index > 1 && nameCount > 1) {
-							subSelector += ':nth-child(' + index + ')';
+							subSelector += `:nth-child(${index})`;
 						}
 					}
 				}
@@ -361,16 +355,16 @@ window.addEventListener("DOMContentLoaded", function() {
 
 		var slideElements = document.querySelectorAll("body > section");
 		var styleRules = new Set();
-		slideElements.forEach(function(se) {
+		slideElements.forEach(se => {
 			var s = slideTree.addChild(se.id, createSlide);
 			var dataStates = se.getAttribute("data-states");
 			if (dataStates) {
-				dataStates.split(" ").forEach(function(path) {
+				dataStates.split(" ").forEach(path => {
 					s.addDescendants(path.split("_"));
 				});
 			}
 
-			se.querySelectorAll("[data-reveal]").forEach(function(r) {
+			se.querySelectorAll("[data-reveal]").forEach(r => {
 				var path = r.getAttribute("data-reveal");
 				var count = r.children.length;
 				var parts;
@@ -391,9 +385,7 @@ window.addEventListener("DOMContentLoaded", function() {
 			generateVisibleStyle(styleRules, s);
 		});
 		var style_elm = document.createElement("style");
-		styleRules.forEach(function(rule) {
-			style_elm.innerHTML += rule;
-		});
+		styleRules.forEach(rule => { style_elm.innerHTML += rule; });
 		document.head.append(style_elm);
 	}
 
@@ -401,7 +393,7 @@ window.addEventListener("DOMContentLoaded", function() {
 		var slides = document.querySelectorAll("body > section");
 		for (var i = 0; i < slides.length; i++) {
 			if (!slides[i].id) {
-				slides[i].id="slide_"+i;
+				slides[i].id=`slide_${i}`;
 				console.warn(`Slide number ${i} does not have an id. Autogenerating one. Manually add an id to be able to link to this slide when javascript is off.`);
 			}
 		}
@@ -443,7 +435,7 @@ window.addEventListener("DOMContentLoaded", function() {
 			webslides.currentSlide = next;
 			webslides.currentSlide.clearStates();
 			var hash = webslides.currentSlide.name();
-			history.pushState(null, document.title+" @ "+hash, "#"+hash);
+			history.pushState(null, `${document.title} @ ${hash}`, `#${hash}`);
 			resnap();
 		}
 	}
@@ -476,7 +468,7 @@ window.addEventListener("DOMContentLoaded", function() {
 				webslides.currentSlide.setInState(webslides.currentPath );
 			}
 			var hash = webslides.currentSlide.name();
-			history.pushState(null, document.title+" @ "+hash, "#"+hash);
+			history.pushState(null, `${document.title} @ ${hash}`, `#${hash}`);
 		}
 		resnap();
 	}
@@ -506,7 +498,7 @@ window.addEventListener("DOMContentLoaded", function() {
 				webslides.currentSlide.savePath(webslides.currentPath);
 				webslides.currentSlide = webslides.getSlide(hash);
 				webslides.currentSlide.restorePath();
-				history.pushState(null, document.title+" @ "+hash, "#"+hash);
+				history.pushState(null, `${document.title} @ ${hash}`, `#${hash}`);
 				break;
 			}
 		}
