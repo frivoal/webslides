@@ -386,6 +386,7 @@ window.addEventListener("DOMContentLoaded", function() {
 				var path = r.getAttribute("data-reveal");
 				var from = r.getAttribute("data-visible-from");
 				var count = r.children.length;
+				if (r.children[count-1] && r.children[count-1].localName == "style") { count -= 1; }
 				var parts;
 				var host;
 				if (!path) {
@@ -398,7 +399,20 @@ window.addEventListener("DOMContentLoaded", function() {
 					parts = [];
 				}
 				parts.push(count);
-				var index = r.getAttribute("data-reveal-start") || ((path && path != from && host) ? 0 : 1);
+				var index = r.getAttribute("data-reveal-start");
+				if (!index) {
+					if (r == se) {
+						if (r.children[0] && r.children[0].localName == "style") {
+							index = 3;
+						} else {
+							index = 2;
+						}
+					} else if (path && path != from && host) {
+						index = 0;
+					} else {
+						index = 1;
+					}
+				}
 				s.addDescendants(parts, index);
 				generateRevealStyle(styleRules, s.name(), path, count, host, index);
 			}
