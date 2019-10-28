@@ -90,16 +90,16 @@ window.addEventListener("DOMContentLoaded", function() {
 				}
 				return child;
 			},
-			addDescendants: function(desc) {
+			addDescendants: function(desc, index=1) {
 				var head = desc[0];
 				var tail = desc.slice(1);
 				if (typeof head == "string") {
 					var c = self.addChild(head);
 					if (tail.length > 0) {
-						c.addDescendants(tail);
+						c.addDescendants(tail, index);
 					}
 				} else if (typeof head == "number") {
-					for (var i = 1; i <= head; i++) {
+					for (var i = index; i <= head; i++) {
 						self.addChild(`${i}`);
 					}
 					if (tail.length > 0) { throw "error: a number must be the last descendant"; }
@@ -385,7 +385,7 @@ window.addEventListener("DOMContentLoaded", function() {
 					parts = [];
 				}
 				parts.push(count);
-				s.addDescendants(parts);
+				s.addDescendants(parts, path ? 0 : 1);
 				generateRevealStyle(styleRules, s.name(), path, count, host);
 			});
 			generateVisibleStyle(styleRules, s);
