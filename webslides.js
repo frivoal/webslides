@@ -282,8 +282,19 @@ window.addEventListener("DOMContentLoaded", function() {
 				});
 			});
 		}
-		function generateRevealStyle(ruleSet, slideName, path, count, host) {
-			for (var i = 1; i <= count; i++) {
+		function generateRevealStyle(ruleSet, slideName, path, count, host, index) {
+			for (var i = 1; i < index; i++) {
+				if (path) {
+					if (host) {
+						ruleSet.add(`:root.uses-script body > section#${slideName}.from-${path} > ${host} > :nth-child(${i}) { visibility: visible; }\n`);
+					} else {
+						ruleSet.add(`:root.uses-script body > section#${slideName}.from-${path} [data-reveal~="${path}"] > :nth-child(${i}) { visibility: visible; }\n`);
+					}
+				} else {
+					ruleSet.add(`:root.uses-script body > section#${slideName} > ${host} > :nth-child(${i}) { visibility: visible; }\n`);
+				}
+			}
+			for (var i = index; i <= count; i++) {
 				if (path) {
 					if (host) {
 						ruleSet.add(`:root.uses-script body > section#${slideName}.from-${path}_${i} > ${host} > :nth-child(${i}) { visibility: visible; }\n`);
@@ -379,8 +390,9 @@ window.addEventListener("DOMContentLoaded", function() {
 					parts = [];
 				}
 				parts.push(count);
-				s.addDescendants(parts, (path && path != from && host) ? 0 : 1);
-				generateRevealStyle(styleRules, s.name(), path, count, host);
+				var index = r.getAttribute("data-reveal-start") || ((path && path != from && host) ? 0 : 1);
+				s.addDescendants(parts, index);
+				generateRevealStyle(styleRules, s.name(), path, count, host, index);
 			});
 			generateVisibleStyle(styleRules, s);
 		});

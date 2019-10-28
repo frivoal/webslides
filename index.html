@@ -181,8 +181,8 @@ pre { font-size: 0.8em; }
 	but implicit sub-states (<code>foo_1</code>, <code>foo_2</code>…) will be created.
 </section>
 
-<section id=reveal-continued>
-	<h3>Progressively revealing children—Continued</h3>
+<section id=reveal-2>
+	<h3>Progressively revealing children—2</h3>
 
 	<p>It is also possible to use <code>data-reveal</code> without specifying a state.
 	In that case,
@@ -194,10 +194,23 @@ pre { font-size: 0.8em; }
 	inside another <code>data-reveal</code> or <code>data-visible-from</code> element,
 	it will start revealing its children
 	once it has itself been revealed.
+</section>
+
+<section id=reveal-3>
+	<h3>Progressively revealing children—3</h3>
 
 	<p>If multiple elements use <code>data-reveal</code> with the same state,
 	or without state (and not nested),
 	they will be shown in parallel.
+
+	<p>If you want the first <code>n-1</code> children to be all revealed
+	as soon as the list is visible,
+	and the progressive revealing to start at the <code>n</code><sup>th</sup> child,
+	use <code>data-reveal-start=n</code> in addition to <code>data-reveal</code>.
+
+	<p>Using different <code>data-reveal-start</code>
+	on several elements with the same <code>data-reveal</code>
+	is not supported.
 </section>
 
 <section id=printing>
@@ -244,6 +257,17 @@ pre { font-size: 0.8em; }
 <section id=ex-reveal>
 	<h3>Revealing List Items</h3>
 	<ul data-reveal>
+		<li>Progressively
+		<li>reveal
+		<li>list
+		<li>items.
+	</ul>
+</section>
+
+<section id=ex-reveal-start>
+	<h3>Revealing List Items, with explicit start</h3>
+	<p>The first list element is visible from the start, and we unroll from the second.
+	<ul data-reveal data-reveal-start=2>
 		<li>Progressively
 		<li>reveal
 		<li>list
