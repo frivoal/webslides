@@ -234,15 +234,10 @@ pre { font-size: 0.8em; }
 	</div>
 </section>
 
-<section data-states="first l1 l2 l3 l4 last" id=ex-states>
+<section data-states="first next last" id=ex-states>
 	<h3>Using States</h3>
-	<p data-visible-from=first>Here is how to
-	<ul>
-		<li data-visible-from=l1>progressively
-		<li data-visible-from=l2>reveal
-		<li data-visible-from=l3>list
-		<li data-visible-from=l4>items.
-	</ul>
+	<p data-visible-from=first>Here is how to show elements
+	<em data-visible-from=next>one at a time.</em>
 	<p data-visible-from=last>Easy?
 </section>
 
@@ -282,14 +277,14 @@ pre { font-size: 0.8em; }
 	<h3>Revealing at an Explicit State</h3>
 	<p data-visible-from=first>Here is how to
 	<ul data-reveal=l>
+		<li>Implicitly!
+		<li>In Parallel!
+	</ul>
+	<ul data-reveal=l>
 		<li>Progressively
 		<li>reveal
 		<li>list
 		<li>items.
-	</ul>
-	<ul data-reveal=l>
-		<li>Implicitly!
-		<li>In Parallel!
 	</ul>
 	<p data-visible-from=last>Easy?
 </section>
