@@ -23,6 +23,12 @@ h1, h2, h3, h4, h5, h6, p, dl, ul, ol, li, figure, pre {
 	margin-block-start: 0;
 }
 li > ul,
-li:not(:first-child) {
+li > ol {
 	margin-top: 0.5em;
+}
+li {
+	margin-bottom: 0.5em;
+}
+li:last-child {
+	margin-bottom: 0;
 }
