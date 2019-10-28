@@ -330,7 +330,9 @@ window.addEventListener("DOMContentLoaded", function() {
 		function findHostPath(elem) {
 			do {
 				var p = elem.parentElement;
-				if (p.hasAttribute("data-reveal")) {
+				if (p.hasAttribute("data-visible-from")) {
+					return p.getAttribute("data-visible-from");
+				} else if (p.hasAttribute("data-reveal")) {
 					var reveal = p.getAttribute("data-reveal");
 					for (var i = 0; elem; elem=elem.previousSibling) {
 						i++;
@@ -363,12 +365,13 @@ window.addEventListener("DOMContentLoaded", function() {
 
 			se.querySelectorAll("[data-reveal]").forEach(r => {
 				var path = r.getAttribute("data-reveal");
+				var from = r.getAttribute("data-visible-from");
 				var count = r.children.length;
 				var parts;
 				var host;
 				if (!path) {
 					host = getSelectorInSlide(r, se);
-					path = findHostPath(r);
+					path = from || findHostPath(r);
 				}
 				if (path) {
 					parts = path.split("_");
@@ -376,7 +379,7 @@ window.addEventListener("DOMContentLoaded", function() {
 					parts = [];
 				}
 				parts.push(count);
-				s.addDescendants(parts, (path && host) ? 0 : 1);
+				s.addDescendants(parts, (path && path != from && host) ? 0 : 1);
 				generateRevealStyle(styleRules, s.name(), path, count, host);
 			});
 			generateVisibleStyle(styleRules, s);
