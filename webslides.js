@@ -36,7 +36,6 @@ window.addEventListener("DOMContentLoaded", function() {
 	function createPath(firstPart) {
 		var path = [firstPart];
 		var self = {
-			_dbg_path: path,
 			push: function(part) {
 				path.push(part);
 			},
@@ -72,8 +71,6 @@ window.addEventListener("DOMContentLoaded", function() {
 	function createNameTree(name) {
 		var tree = [];
 		var self = {
-			_dbg_tree: tree,
-			_dbg_name: name,
 			name: function() { return name; },
 			addChild: function(name, opt_constructor) {
 				var create = opt_constructor || createNameTree;
