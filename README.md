@@ -14,8 +14,11 @@ Documentation available at <a href="https://frivoal.github.io/webslides/">frivoa
 ### By [me](http://florian.rivoal.net/):
 
 * [W3C Process 2019 Update](http://florian.rivoal.net/talks/process-2019)
+* [Line Breaking in CSS](http://florian.rivoal.net/talks/line-breaking)
 
 ### By [fantasai](http://fantasai.inkedblade.net/):
 
 * [Designing CSS](http://fantasai.inkedblade.net/style/talks/designing-css/)
 * [the CSSWG process](http://fantasai.inkedblade.net/style/talks/csswg-process/)
+* [i18n: A Brief Primer of Web Internationalization](http://fantasai.inkedblade.net/style/talks/i18n-primer/)
+* [about:standardization](http://fantasai.inkedblade.net/style/talks/about-standardization/)
