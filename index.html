@@ -321,9 +321,6 @@ pre { font-size: 0.8em; }
 
 
 <section data-states="l" id=ex-sub>
-<style>
-#ex-sub.in-l_3 ol { background: pink; }
-</style>
 	<h3>Revealing list and using Sub-States</h3>
 	<p data-visible-from=l>How about some sub-states?
 	<ul data-reveal=l>
@@ -337,9 +334,19 @@ pre { font-size: 0.8em; }
 			</ol>
 		<li>items.
 	</ul>
+<style>
+#ex-sub.in-l_3 ol { background: pink; }
+</style>
 </section>
 
 <section data-states="l1 l2 l3 l4" id=ex-styling>
+	<h3>Explicitly Style States</h3>
+	<ul>
+		<li data-visible-from=l1>Progressively reveal
+		<li data-visible-from=l2>list items.
+		<li data-visible-from=l3>Gray out
+		<li data-visible-from=l4>all but the last.
+	</ul>
 <style>
 #ex-styling li { color: gray; }
 #ex-styling.in-l1 [data-visible-from=l1],
@@ -350,21 +357,9 @@ pre { font-size: 0.8em; }
 }
 :root:not(.uses-script) #ex-styling li { color: black; }
 </style>
-	<h3>Explicitly Style States</h3>
-	<ul>
-		<li data-visible-from=l1>Progressively reveal
-		<li data-visible-from=l2>list items.
-		<li data-visible-from=l3>Gray out
-		<li data-visible-from=l4>all but the last.
-	</ul>
 </section>
 
 <section id=ex-free-style>
-<style>
-#ex-free-style { writing-mode: vertical-rl; }
-#ex-free-style h3 { text-orientation: upright; }
-#ex-free-style div { margin: auto; }
-</style>
 <div>
 	<h3>Styling Freedom</h3>
 
@@ -372,14 +367,14 @@ pre { font-size: 0.8em; }
 	no sweat.
 	This does not disturb the slide system.
 </div>
+<style>
+#ex-free-style { writing-mode: vertical-rl; }
+#ex-free-style h3 { text-orientation: upright; }
+#ex-free-style div { margin: auto; }
+</style>
 </section>
 
 <section id=ex-complex data-states="t1 t2 t3">
-<style>
-#ex-complex table { border-collapse: collapse; }
-#ex-complex td, #ex-complex th { border: solid 2px; }
-#ex-complex.in-t2 tr:nth-child(2) { background: lightpink; }
-</style>
 	<h3>Revealing and Highlighting Complex Markup</h3>
 
 	<table>
@@ -393,9 +388,24 @@ pre { font-size: 0.8em; }
 			<th>Baz
 			<td data-visible-from=t3>on parts of a table
 	</table>
+<style>
+#ex-complex table { border-collapse: collapse; }
+#ex-complex td, #ex-complex th { border: solid 2px; }
+#ex-complex.in-t2 tr:nth-child(2) { background: lightpink; }
+</style>
 </section>
 
 <section id=ex-anim data-states="anim1 anim2 stop">
+	<h3>Controlling Animations</h3>
+
+	<ul>
+		<li data-visible-from=anim1>Animation 1 starts
+		<li data-visible-from=anim2>Animation 2 starts
+		<li data-visible-from=stop>Both animations stop
+	</ul>
+	<p data-visible-in=print>This slide has animated content.
+	<div id=a1></div>
+	<div id=a2></div>
 <style>
 #ex-anim div {
 	border: solid 50px;
@@ -430,15 +440,5 @@ pre { font-size: 0.8em; }
   to { height: 50vh; }
 }
 </style>
-	<h3>Controlling Animations</h3>
-
-	<ul>
-		<li data-visible-from=anim1>Animation 1 starts
-		<li data-visible-from=anim2>Animation 2 starts
-		<li data-visible-from=stop>Both animations stop
-	</ul>
-	<p data-visible-in=print>This slide has animated content.
-	<div id=a1></div>
-	<div id=a2></div>
 </section>
 <script>hljs.initHighlightingOnLoad();</script>
