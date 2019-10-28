@@ -291,7 +291,11 @@ window.addEventListener("DOMContentLoaded", function() {
 						ruleSet.add(`:root.uses-script body > section#${slideName}.from-${path} [data-reveal~="${path}"] > :nth-child(${i}) { visibility: visible; }\n`);
 					}
 				} else {
-					ruleSet.add(`:root.uses-script body > section#${slideName} > ${host} > :nth-child(${i}) { visibility: visible; }\n`);
+					if (host) {
+						ruleSet.add(`:root.uses-script body > section#${slideName} > ${host} > :nth-child(${i}) { visibility: visible; }\n`);
+					} else {
+						ruleSet.add(`:root.uses-script body > section#${slideName} > :nth-child(${i}) { visibility: visible; }\n`);
+					}
 				}
 			}
 			for (var i = index; i <= count; i++) {
@@ -302,7 +306,11 @@ window.addEventListener("DOMContentLoaded", function() {
 						ruleSet.add(`:root.uses-script body > section#${slideName}.from-${path}_${i} [data-reveal~="${path}"] > :nth-child(${i}) { visibility: visible; }\n`);
 					}
 				} else {
-					ruleSet.add(`:root.uses-script body > section#${slideName}.from-${i} > ${host} > :nth-child(${i}) { visibility: visible; }\n`);
+					if (host) {
+						ruleSet.add(`:root.uses-script body > section#${slideName}.from-${i} > ${host} > :nth-child(${i}) { visibility: visible; }\n`);
+					} else {
+						ruleSet.add(`:root.uses-script body > section#${slideName}.from-${i} > :nth-child(${i}) { visibility: visible; }\n`);
+					}
 				}
 			}
 		}
@@ -374,7 +382,7 @@ window.addEventListener("DOMContentLoaded", function() {
 				});
 			}
 
-			se.querySelectorAll("[data-reveal]").forEach(r => {
+			var revealer = r => {
 				var path = r.getAttribute("data-reveal");
 				var from = r.getAttribute("data-visible-from");
 				var count = r.children.length;
@@ -393,7 +401,9 @@ window.addEventListener("DOMContentLoaded", function() {
 				var index = r.getAttribute("data-reveal-start") || ((path && path != from && host) ? 0 : 1);
 				s.addDescendants(parts, index);
 				generateRevealStyle(styleRules, s.name(), path, count, host, index);
-			});
+			}
+			if (se.hasAttribute("data-reveal")) { revealer(se); }
+			se.querySelectorAll("[data-reveal]").forEach(revealer);
 			generateVisibleStyle(styleRules, s);
 		});
 		var style_elm = document.createElement("style");
