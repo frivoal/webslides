@@ -1,0 +1,44 @@
+:root {
+	font-size: 6vmin;
+}
+section {
+	display: flex;
+	flex-flow: column wrap;
+	align-content: center;
+	justify-content: flex-start;
+	padding: 1em;
+	position: relative;
+}
+section > :last-child {
+	margin-bottom: 0;
+}
+section > :first-child:last-child {
+	margin: auto;
+}
+h1, h2, h3 {
+	text-align: center;
+}
+pre {
+	white-space: pre-wrap;
+}
+h1, h2, h3, h4, h5, h6, p, dl, ul, ol, li, figure, pre {
+	margin-top: 0;
+}
+li > ul,
+li > ol {
+	margin-top: 0.5em;
+}
+li {
+	margin-bottom: 0.5em;
+}
+li:last-child {
+	margin-bottom: 0;
+}
+@media screen {
+	:root {
+		background: black;
+		color: white;
+	}
+	:link { color: #0055ff; }
+	:visited { color: #7755ff; }
+}
